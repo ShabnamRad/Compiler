@@ -3,7 +3,7 @@ Fixed Grammar (without left-recursion, with factorization):
 2. declaration-list -> declaration-list declaration | ϵ
 * declaration-list -> declaration-rest
 * declaration-rest -> declaration declaration-rest | ϵ
-> * => declaration-list -> declaration declaration-list | ϵ
+    * => declaration-list -> declaration declaration-list | ϵ
 3. declaration -> var-declaration | fun-declaration
 4. var-declaration -> type-specifier ID ; | type-specifier ID [ NUM ] ;
 * var-declaration -> type-specifier ID num
@@ -21,7 +21,7 @@ Fixed Grammar (without left-recursion, with factorization):
 11. statement-list -> statement-list statement | ϵ
 * statement-list -> stmt-rest
 * stmt-rest -> statement stmt-rest | ϵ
-** => statement-list -> statement statement-list | ϵ
+    * => statement-list -> statement statement-list | ϵ
 12. statement -> expression-stmt | compound-stmt | selection-stmt | iteration-stmt |
 return-stmt | switch-stmt
 13. expression-stmt -> expression ; | continue ; | break ; | ;
@@ -34,7 +34,7 @@ return-stmt | switch-stmt
 18. case-stmts -> case-stmts case-stmt | ϵ
 * case-stmts -> case-stmt-rest
 * case-stmt-rest -> case-stmt case-stmt-rest | ϵ
-** => case-stmts -> case-stmt case-stmts | ϵ
+    * => case-stmts -> case-stmt case-stmts | ϵ
 19. case-stmt -> case NUM : statement-list
 20. default-stmt -> default : statement-list | ϵ
 21. expression -> var = expression | simple-expression
