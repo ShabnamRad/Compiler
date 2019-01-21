@@ -3,7 +3,7 @@ Fixed Grammar (without left-recursion, with factorization):
 2. declaration-list -> declaration-list declaration | ϵ
 * declaration-list -> declaration-rest
 * declaration-rest -> declaration declaration-rest | ϵ
-** => declaration-list -> declaration declaration-list | ϵ
+> * => declaration-list -> declaration declaration-list | ϵ
 3. declaration -> var-declaration | fun-declaration
 4. var-declaration -> type-specifier ID ; | type-specifier ID [ NUM ] ;
 * var-declaration -> type-specifier ID num
