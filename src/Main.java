@@ -1,5 +1,6 @@
-import Scanner.LexicalAnalyzer;
-import Scanner.Token;
+import Scanner.Analyzer;
+
+import java.io.File;
 
 /**
  * Created by Shabnam on 1/21/2019
@@ -11,10 +12,6 @@ public class Main {
             return;
         }
 
-        LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(args[0]);
-        Token token;
-        while((token = lexicalAnalyzer.getNextToken()) != null) {
-            System.out.println("tokenID: " + token.getTokenID() + " lexeme: " + token.getLexeme());
-        }
+        Analyzer lexicalAnalyzer = new Analyzer(new File(args[0]));
     }
 }

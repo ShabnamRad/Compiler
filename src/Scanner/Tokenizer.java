@@ -3,7 +3,7 @@ package Scanner;
 /**
  * Created by Shabnam on 1/21/2019
  */
-public class Token {
+public class Tokenizer {
     private String lexeme = "";
     private TokenID tokenID = null;
 
