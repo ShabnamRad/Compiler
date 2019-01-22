@@ -38,7 +38,9 @@ return-stmt | switch-stmt
 19. case-stmt -> case NUM : statement-list
 20. default-stmt -> default : statement-list | ϵ
 21. expression -> var = expression | simple-expression
-22. var -> ID | ID [ expression ]
+22. var -> ID | ID [expression]
+  * var -> ID index
+  * index -> [expression] | ϵ
 23. simple-expression -> additive-expression relop additive-expression | additive-expression
   * simple-expression -> additive-expression add-expr-gen
   * add-expr-gen -> relop additive-expression | ϵ
