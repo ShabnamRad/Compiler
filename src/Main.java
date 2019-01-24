@@ -1,4 +1,4 @@
-import Scanner.Analyzer;
+import Scanner.LexicalAnalyzer;
 
 import java.io.File;
 
@@ -12,6 +12,6 @@ public class Main {
             return;
         }
 
-        Analyzer lexicalAnalyzer = new Analyzer(new File(args[0]));
+        LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(new File(args[0]));
     }
 }

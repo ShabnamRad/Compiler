@@ -1,5 +1,7 @@
 package Scanner;
 
+import SymbolTable.SymbolTable;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashSet;
@@ -8,14 +10,14 @@ import java.util.Scanner;
 /**
  * Created by Shabnam on 1/21/2019.
  */
-public class Analyzer {
+public class LexicalAnalyzer {
 
     private java.util.Scanner sc;
     private String cline;
     private int index, lnum;
     private HashSet<Character> SpecialChars;
 
-    public Analyzer(File f) {
+    public LexicalAnalyzer(File f) {
         try {
             sc = new Scanner(f);
         } catch (FileNotFoundException e) {
@@ -60,15 +62,16 @@ public class Analyzer {
 
     private int prev = -1;
     private char prevc = ' ';
-    public Tokenizer getToken() {
+    public Token getToken() {
         StringBuilder raw = new StringBuilder();
         boolean found = false;
-        int current = -1; //-1: unknown, 0: string, 1: number, 2: mixed, 3: special char, 4: relop, 5: comment
+        int current = -1; //-1: unknown/eof, 0: string, 1: number, 2: mixed, 3: special char, 4: relop, 5: comment
         boolean comment = false;
         int comment_state = 0;
         do {
             char c = getChar();
             if (c == (char) -1) {
+                raw.append(c);
                 found = true;
             }
             if (comment) {
@@ -126,7 +129,11 @@ public class Analyzer {
             } else if (current == 1) {
                 if (Character.isDigit(c)) {
                     raw.append(c);
-                } else if (c == '<' || SpecialChars.contains(c) || Character.isAlphabetic(c)) {
+                } else if (Character.isAlphabetic(c)) {
+                    raw.delete(0, raw.length());
+                    returnLastChar();
+                    System.out.println("wrong input, identifier starts with number at input location line: " + lnum + " index:" + index);
+                } else if (c == '<' || SpecialChars.contains(c)) {
                     returnLastChar();
                     found = true;
                 } else if (Character.isWhitespace(c)) {
@@ -169,19 +176,33 @@ public class Analyzer {
         prevc = c;
         } while (!found);
 
-        if(raw.toString().equals("sizeof"))
-            System.out.println("hey");
         System.out.println(raw.toString());
 
         prev = current;
-        return new Tokenizer();
+        return Tokenize(raw.toString(), current);
+    }
+
+    private Token Tokenize(String inp, int c) {
+        try {
+            return new Token(inp);
+        } catch (Error e1) {
+            try {
+                return SymbolTable.get(inp);
+            } catch (Error e2) {
+                String name = c == 1? "NUM":"ID";
+                String type = c == 1? "INT":"unknown";
+                Token t = new Token(inp, name, type);
+                System.out.println("\tnew identifier");
+                SymbolTable.add(t);
+                return t;
+            }
+        }
     }
 
     // some testing
     public static void main(String[] args) {
-        Scanner sc = null;
-        Analyzer a = new Analyzer(new File("C:\\Users\\parha\\Desktop\\main.c"));
-        for (int i = 0; i < 550; i++) {
+        LexicalAnalyzer a = new LexicalAnalyzer(new File("C:\\Users\\parha\\Desktop\\mai.c"));
+        for (int i = 0; i < 15; i++) {
             a.getToken();
         }
     }
