@@ -29,6 +29,8 @@ public class Token {
 
     private boolean checkSymbols(String inp) {
         boolean val = true;
+        this.lexeme = inp;
+        this.type = "special";
         switch (inp) {
             case ";":
                 this.tokenName = "semi-colon";
@@ -69,12 +71,21 @@ public class Token {
             case "}":
                 this.tokenName = "curly-braces-close";
                 break;
+            case "<":
+                this.tokenName = "less-than";
+                this.type = "relop";
+                break;
+            case "==":
+                this.tokenName = "equals";
+                this.type = "relop";
+                break;
+            case "\uFFFF":
+                this.tokenName = "EOF";
+                break;
             default:
                 val = false;
-        }
-        if (val) {
-            this.lexeme = inp;
-            this.type = "special";
+                this.lexeme = null;
+                this.type = null;
         }
         return val;
     }
