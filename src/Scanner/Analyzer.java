@@ -60,7 +60,7 @@ public class Analyzer {
 
     private int prev = -1;
     private char prevc = ' ';
-    public Tokenizer getToken() {
+    public Token getToken() {
         StringBuilder raw = new StringBuilder();
         boolean found = false;
         int current = -1; //-1: unknown, 0: string, 1: number, 2: mixed, 3: special char, 4: relop, 5: comment
@@ -174,7 +174,7 @@ public class Analyzer {
         System.out.println(raw.toString());
 
         prev = current;
-        return new Tokenizer();
+        return new Token(raw.toString());
     }
 
     // some testing
