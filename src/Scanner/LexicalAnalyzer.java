@@ -130,6 +130,7 @@ public class LexicalAnalyzer {
                 if (Character.isDigit(c)) {
                     raw.append(c);
                 } else if (Character.isAlphabetic(c)) {
+                    current = -1;
                     raw.delete(0, raw.length());
                     returnLastChar();
                     System.out.println("wrong input, identifier starts with number at input location line: " + lnum + " index:" + index);
