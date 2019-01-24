@@ -54,7 +54,7 @@ enum TokenID {
     SUB("-"),
     MULT("*"),
     IDENTIFIER(null),
-    INTEGER(null),
+    NUMBER(null),
     ERROR(null);
 
     String regexStr;
