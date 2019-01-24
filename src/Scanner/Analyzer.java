@@ -40,42 +40,66 @@ public class Analyzer {
     }
 
     private char getChar() {
+        index ++;
         if (cline == null || index > cline.length()) {
             if (sc.hasNextLine()) {
                 cline = sc.nextLine() + ' ';
-                index = 0;
+                index = 1;
                 lnum ++;
             }
             else {
                 System.out.println("end of input");
-                return ' ';
+                return (char) -1;
             }
         }
-        return cline.charAt(index);
+
+        return cline.charAt(index - 1);
     }
 
     private void returnLastChar() {index --;}
 
     private int prev = -1;
+    private char prevc = ' ';
     public Tokenizer getToken() {
         StringBuilder raw = new StringBuilder();
         boolean found = false;
-        int current = -1; //-1: unknown, 0: string, 1: number, 2: mixed, 3: special char
+        int current = -1; //-1: unknown, 0: string, 1: number, 2: mixed, 3: special char, 4: relop, 5: comment
+        boolean comment = false;
+        int comment_state = 0;
         do {
             char c = getChar();
-            if (current == -1) {
+            if (c == (char) -1) {
+                found = true;
+            }
+            if (comment) {
+                if (comment_state == 0) {
+                    if (c == '*')
+                        comment_state = 1;
+                } else {
+                    if (c == '/') {
+                        comment = false;
+                        current = -1;
+                    }
+                    comment_state = 0;
+                }
+            } else if (current == -1) {
                 if (Character.isAlphabetic(c)) {
                     current = 0;
                     raw.append(c);
                 } else if (Character.isDigit(c)) {
                     current = 1;
                     raw.append(c);
+                } else if (c == '<' || c == '=') {
+                    current = 4;
+                    raw.append(c);
+                } else if (c == '/') {
+                    current = 5;
                 } else if (SpecialChars.contains(c)) {
                     current = 3;
                     raw.append(c);
                     found = true;
                 } else if (c == '-' || c == '+') {
-                    if (prev == 1 || prev == 2) {
+                    if (prev == 0 || prev == 1 || prev == 2 || prevc == ')' || prevc == ']') {
                         raw.append(c);
                         found = true;
                     } else {
@@ -88,10 +112,10 @@ public class Analyzer {
             } else if (current == 0) {
                 if (Character.isAlphabetic(c)) {
                     raw.append(c);
-                } else if ( Character.isDigit(c)){
+                } else if (Character.isDigit(c)) {
                     current = 2;
                     raw.append(c);
-                } else if (SpecialChars.contains(c)) {
+                } else if (c == '<' || SpecialChars.contains(c)) {
                     returnLastChar();
                     found = true;
                 } else if (Character.isWhitespace(c)) {
@@ -102,7 +126,7 @@ public class Analyzer {
             } else if (current == 1) {
                 if (Character.isDigit(c)) {
                     raw.append(c);
-                } else if (SpecialChars.contains(c) || Character.isAlphabetic(c)) {
+                } else if (c == '<' || SpecialChars.contains(c) || Character.isAlphabetic(c)) {
                     returnLastChar();
                     found = true;
                 } else if (Character.isWhitespace(c)) {
@@ -110,19 +134,44 @@ public class Analyzer {
                 } else {
                     System.out.println("ignoring unrecognized char at input location line: " + lnum + " index:" + index);
                 }
-            } else {
+            } else if (current == 2) {
                 if (Character.isAlphabetic(c) || Character.isDigit(c)) {
                     raw.append(c);
-                } else if (SpecialChars.contains(c)) {
+                } else if (c == '<' || SpecialChars.contains(c)) {
                     returnLastChar();
                     found = true;
                 } else if (Character.isWhitespace(c)) {
                     found = true;
                 } else {
+                    System.out.println("ignoring unrecognized char at input location line: " + lnum + " index:" + index);
+                }
+            } else if (current == 4) {
+                if (prevc == '=' && c == '=') {
+                    raw.append(c);
+                    found = true;
+                } else if (prevc == '<') {
+                    returnLastChar();
+                    found = true;
+                } else {
+                    current = 3;
+                    returnLastChar();
+                    found = true;
+                }
+            } else {
+                if (c == '*') {
+                    comment = true;
+                } else {
+                    current = -1;
+                    returnLastChar();
                     System.out.println("ignoring unrecognized char at input location line: " + lnum + " index:" + index);
                 }
             }
+        prevc = c;
         } while (!found);
+
+        if(raw.toString().equals("sizeof"))
+            System.out.println("hey");
+        System.out.println(raw.toString());
 
         prev = current;
         return new Tokenizer();
@@ -130,13 +179,10 @@ public class Analyzer {
 
     // some testing
     public static void main(String[] args) {
-        //Analyzer a = new Analyzer()
         Scanner sc = null;
-        try {
-            sc = new Scanner(new File("C:\\Users\\parha\\Desktop\\shared\\to push\\singlesample\\cs_sim_strainSolver.py"));
-            System.out.println(sc.nextLine());
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        Analyzer a = new Analyzer(new File("C:\\Users\\parha\\Desktop\\main.c"));
+        for (int i = 0; i < 550; i++) {
+            a.getToken();
         }
     }
 
