@@ -1,7 +1,7 @@
 package Scanner;
 
 /**
- * Created by Shabnam on 1/21/2019
+ * Created by Shabnam on 1/21/2019.
  */
 public class Tokenizer {
     private String lexeme = "";
@@ -47,6 +47,7 @@ enum TokenID {
     SWITCH("switch"),
     CASE("case"),
     DEFAULT("default"),
+    COLON(":"),
     ASSIGN("="),
     LT("<"),
     EQ("=="),
