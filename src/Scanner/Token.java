@@ -33,57 +33,57 @@ public class Token {
         this.type = "special";
         switch (inp) {
             case ";":
-                this.tokenName = "semi-colon";
+                this.tokenName = ";";
                 break;
             case ":":
-                this.tokenName = "colon";
+                this.tokenName = ":";
                 break;
             case ",":
-                this.tokenName = "comma";
+                this.tokenName = ",";
                 break;
             case "+":
-                this.tokenName = "summation";
+                this.tokenName = "+";
                 break;
             case "-":
-                this.tokenName = "subtraction";
+                this.tokenName = "-";
                 break;
             case "*":
-                this.tokenName = "multiplication";
+                this.tokenName = "*";
                 break;
             case "=":
-                this.tokenName = "assign";
+                this.tokenName = "=";
                 break;
             case "(":
-                this.tokenName = "parentheses-open";
+                this.tokenName = "(";
                 break;
             case ")":
-                this.tokenName = "parentheses-close";
+                this.tokenName = ")";
                 break;
             case "[":
-                this.tokenName = "brackets-open";
+                this.tokenName = "[";
                 break;
             case "]":
-                this.tokenName = "brackets-close";
+                this.tokenName = "]";
                 break;
             case "{":
-                this.tokenName = "curly-braces-open";
+                this.tokenName = "{";
                 break;
             case "}":
-                this.tokenName = "curly-braces-close";
+                this.tokenName = "}";
                 break;
             case "<":
-                this.tokenName = "less-than";
+                this.tokenName = "<";
                 this.type = "relop";
                 break;
             case "==":
-                this.tokenName = "equals";
+                this.tokenName = "==";
                 this.type = "relop";
                 break;
             case "\uFFFF":
                 this.tokenName = "EOF";
                 break;
             case "$":
-                this.tokenName = "dollar";
+                this.tokenName = "$";
                 break;
             case "\\eps":
                 this.tokenName = "epsilon";
