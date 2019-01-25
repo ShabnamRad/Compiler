@@ -159,7 +159,12 @@ public class Token {
     }
 
     @Override
+    public int hashCode() {
+        return tokenName.hashCode();
+    }
+
+    @Override
     public String toString() {
-        return super.toString() + "(" + lexeme + ", " + tokenName + ", " + type + ")";
+        return "( " + lexeme + ", " + tokenName + ", " + type + " )";
     }
 }

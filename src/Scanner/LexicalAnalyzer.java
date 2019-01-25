@@ -57,7 +57,7 @@ public class LexicalAnalyzer {
             }
             else {
                 endOfInput = true;
-                System.out.println("end of input");
+//                System.out.println("end of input");
                 return (char) -1;
             }
         }
@@ -79,7 +79,7 @@ public class LexicalAnalyzer {
         do {
             if (end) throw new Error("Input has ended");
             char c = getChar();
-            System.out.println((int) c);
+//            System.out.println((int) c);
             if (c == (char) -1) {
                 raw.append(c);
                 found = true;
@@ -202,19 +202,10 @@ public class LexicalAnalyzer {
                 String name = c == 1? "NUM":"ID";
                 String type = c == 1? "INT":"unknown";
                 Token t = new Token(inp, name, type);
-                System.out.println("\tnew identifier");
+//                System.out.println("\tnew identifier");
                 SymbolTable.add(t);
                 return t;
             }
         }
     }
-
-    // some testing
-    public static void main(String[] args) {
-        LexicalAnalyzer a = new LexicalAnalyzer(new File("C:\\Users\\Shabnam\\Documents\\University\\Term 7\\Compiler\\Project\\test.c"));
-        for (int i = 0; i < 550; i++) {
-            a.getToken();
-        }
-    }
-
 }

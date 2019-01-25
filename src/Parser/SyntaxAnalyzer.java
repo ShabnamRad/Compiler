@@ -1,5 +1,7 @@
 package Parser;
 
+import Scanner.LexicalAnalyzer;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -7,8 +9,11 @@ import java.util.Map;
 
 public class SyntaxAnalyzer {
     private ArrayList<Diagram> transitionDigrams;
+    private LexicalAnalyzer lexicalAnalyzer;
+    private Grammar grammar = Grammar.getInstance();
 
-    public SyntaxAnalyzer() {
+    public SyntaxAnalyzer(LexicalAnalyzer lexicalAnalyzer) {
+        this.lexicalAnalyzer = lexicalAnalyzer;
         transitionDigrams = new ArrayList<>();
         Diagram program = new Diagram();
         Diagram declaration_list = new Diagram();
