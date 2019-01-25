@@ -39,10 +39,16 @@ public class LexicalAnalyzer {
         SpecialChars.add(']');
         SpecialChars.add('{');
         SpecialChars.add('}');
+        SpecialChars.add('$');
     }
 
+    private boolean endOfInput = false;
     private char getChar() {
         index ++;
+        if (endOfInput) {
+            end = true;
+            return '$';
+        }
         if (cline == null || index > cline.length()) {
             if (sc.hasNextLine()) {
                 cline = sc.nextLine() + ' ';
@@ -50,11 +56,11 @@ public class LexicalAnalyzer {
                 lnum ++;
             }
             else {
+                endOfInput = true;
                 System.out.println("end of input");
                 return (char) -1;
             }
         }
-
         return cline.charAt(index - 1);
     }
 
@@ -62,6 +68,7 @@ public class LexicalAnalyzer {
 
     private int prev = -1;
     private char prevc = ' ';
+    private boolean end = false;
     public Token getToken() {
         StringBuilder raw = new StringBuilder();
         boolean found = false;
@@ -69,12 +76,13 @@ public class LexicalAnalyzer {
         boolean comment = false;
         int comment_state = 0;
         do {
+            if (end) throw new Error("Input has ended");
             char c = getChar();
+            System.out.println((int) c);
             if (c == (char) -1) {
                 raw.append(c);
                 found = true;
-            }
-            if (comment) {
+            } else if (comment) {
                 if (comment_state == 0) {
                     if (c == '*')
                         comment_state = 1;
@@ -118,7 +126,7 @@ public class LexicalAnalyzer {
                 } else if (Character.isDigit(c)) {
                     current = 2;
                     raw.append(c);
-                } else if (c == '<' || SpecialChars.contains(c)) {
+                } else if (c == '<' || SpecialChars.contains(c) || c == '-' || c == '+') {
                     returnLastChar();
                     found = true;
                 } else if (Character.isWhitespace(c)) {
@@ -134,7 +142,7 @@ public class LexicalAnalyzer {
                     raw.delete(0, raw.length());
                     returnLastChar();
                     System.out.println("wrong input, identifier starts with number at input location line: " + lnum + " index:" + index);
-                } else if (c == '<' || SpecialChars.contains(c)) {
+                } else if (c == '<' || SpecialChars.contains(c) || c == '-' || c == '+') {
                     returnLastChar();
                     found = true;
                 } else if (Character.isWhitespace(c)) {
@@ -145,7 +153,7 @@ public class LexicalAnalyzer {
             } else if (current == 2) {
                 if (Character.isAlphabetic(c) || Character.isDigit(c)) {
                     raw.append(c);
-                } else if (c == '<' || SpecialChars.contains(c)) {
+                } else if (c == '<' || SpecialChars.contains(c) || c == '-' || c == '+') {
                     returnLastChar();
                     found = true;
                 } else if (Character.isWhitespace(c)) {
@@ -202,8 +210,8 @@ public class LexicalAnalyzer {
 
     // some testing
     public static void main(String[] args) {
-        LexicalAnalyzer a = new LexicalAnalyzer(new File("C:\\Users\\parha\\Desktop\\mai.c"));
-        for (int i = 0; i < 15; i++) {
+        LexicalAnalyzer a = new LexicalAnalyzer(new File("C:\\Users\\parha\\Desktop\\main.c"));
+        for (int i = 0; i < 550; i++) {
             a.getToken();
         }
     }

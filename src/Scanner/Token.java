@@ -82,6 +82,12 @@ public class Token {
             case "\uFFFF":
                 this.tokenName = "EOF";
                 break;
+            case "$":
+                this.tokenName = "dollar";
+                break;
+            case "\\eps":
+                this.tokenName = "epsilon";
+                break;
             default:
                 val = false;
                 this.lexeme = null;
