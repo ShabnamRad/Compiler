@@ -1,6 +1,6 @@
 package Parser;
 
-import Scanner.LexicalAnalyzer;
+import Scanner.Token;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,12 +10,18 @@ import java.util.Map;
  * Created by Shabnam on 1/24/2019.
  */
 class Diagram {
+    private String name;
     private ArrayList<State> states;
     private State startState;
 
-    Diagram() {
+    Diagram(String name) {
+        this.name = name;
         states = new ArrayList<>();
         startState = null;
+    }
+
+    public String getName() {
+        return name;
     }
 
     void addState(State state) {
@@ -32,39 +38,8 @@ class Diagram {
         this.states.add(this.startState);
     }
 
-    public boolean traverse(LexicalAnalyzer lexicalAnalyzer) {
-        State curr = this.startState;
-        while(!curr.isEndState()) {
-            boolean found = false;
-            String tokenName = lexicalAnalyzer.getToken().getTokenName();
-            for (Edge edge : curr.getChildren().keySet()) {
-                if(edge.isDiagram()) {
-                    Diagram candidateDiagram = edge.getDiagram();
-                    //TODO: check for t in First
-                    if (false) {
-                        if (!candidateDiagram.traverse(lexicalAnalyzer))
-                            return false;
-                        curr = curr.getChildren().get(edge);
-                        found = true;
-                        break;
-                    }
-                } else if(edge.getTokenName().equals("epsilon")) {
-                    //TODO: check for t in follow
-                    if(false) {
-                        curr = curr.getChildren().get(edge);
-                        found = true;
-                        break;
-                    }
-                } else if (edge.getTokenName().equals(tokenName)) {
-                    curr = curr.getChildren().get(edge);
-                    found = true;
-                    break;
-                }
-            }
-            if(!found)
-                return false;
-        }
-        return true;
+    public State getStartState() {
+        return startState;
     }
 }
 
@@ -114,12 +89,17 @@ class State {
 
 class Edge {
     private boolean isDiagram;
-    private String tokenName;
+    private Token token;
     private Diagram diagram;
 
     Edge(String tokenName) {
         isDiagram = false;
-        this.tokenName = tokenName;
+        if(tokenName.equals("ID"))
+            this.token = new Token(null, tokenName, "unknown");
+        else if(tokenName.equals("NUM"))
+            this.token = new Token(null, tokenName, "INT");
+        else
+            this.token = new Token(tokenName);
     }
 
     Edge(Diagram diagram) {
@@ -131,8 +111,8 @@ class Edge {
         return isDiagram;
     }
 
-    String getTokenName() {
-        return tokenName;
+    Token getToken() {
+        return token;
     }
 
     Diagram getDiagram() {

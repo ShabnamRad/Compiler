@@ -68,7 +68,7 @@ public class Grammar {
         return instance;
     }
 
-    private HashSet<Token> first(Token token) {
+    HashSet<Token> first(Token token) {
        if(firsts.containsKey(token))
            return firsts.get(token);
        HashSet<Token> res = new HashSet<>();
@@ -107,7 +107,7 @@ public class Grammar {
         return res;
     }
 
-    private HashSet<Token> follow(Token nonterminal) {
+    HashSet<Token> follow(Token nonterminal) {
         if(follows.containsKey(nonterminal))
             return follows.get(nonterminal);
         if(!nonterminal.getType().equals("NONTERMINAL")) {
@@ -137,17 +137,23 @@ public class Grammar {
             firstBeta.remove(new Token("\\eps"));
             res.addAll(firstBeta);
         }
+        follows.put(nonterminal, res);
         return res;
     }
 
-    private int findNonTerminal(Token[] definitions, Token nonTerminal) {
+    private int findNonTerminal(Token[] arr, Token nonTerminal) {
         int index = 0;
-        for (Token definition : definitions) {
-            if (nonTerminal.equals(definition))
+        for (Token element : arr) {
+            if (nonTerminal.equals(element))
                 return index;
             index ++;
         }
         return -1;
+    }
+
+    Token getDiagramNonTerminal(Diagram diagram) {
+        int index = findNonTerminal(nonTerminals, new Token(null, diagram.getName(), "NONTERMINAL"));
+        return nonTerminals[index];
     }
 
     @Override
@@ -191,12 +197,7 @@ class Production {
     public String toString() {
         StringBuilder definitionString = new StringBuilder();
         for (Token token : definitions) {
-            String name;
-            if(token.getType().equals("NONTERMINAL"))
-                name = token.getTokenName();
-            else
-                name = token.getLexeme();
-            definitionString.append(name).append(" ");
+            definitionString.append(token.getTokenName()).append(" ");
         }
         return nonTerminal.getTokenName() + " -> " + definitionString;
     }
