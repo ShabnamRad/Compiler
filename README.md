@@ -17,16 +17,16 @@ Fixed Grammar (without left-recursion, with factorization):
 9. param -> type-specifier ID | type-specifier ID [ ]
   * param -> type-specifier ID brackets
   * brackets -> [ ] | ϵ
-10. compound-stmt -> { declaration-list production-list }
-11. production-list -> production-list production | ϵ
-  * production-list -> stmt-rest
-  * stmt-rest -> production stmt-rest | ϵ
-    * => production-list -> production production-list | ϵ
-12. production -> expression-stmt | compound-stmt | selection-stmt | iteration-stmt |
+10. compound-stmt -> { declaration-list statement-list }
+11. statement-list -> statement-list statement | ϵ
+  * statement-list -> stmt-rest
+  * stmt-rest -> statement stmt-rest | ϵ
+    * => statement-list -> statement statement-list | ϵ
+12. statement -> expression-stmt | compound-stmt | selection-stmt | iteration-stmt |
 return-stmt | switch-stmt
 13. expression-stmt -> expression ; | continue ; | break ; | ;
-14. selection-stmt -> if ( expression ) production else production
-15. iteration-stmt -> while ( expression ) production
+14. selection-stmt -> if ( expression ) statement else statement
+15. iteration-stmt -> while ( expression ) statement
 16. return-stmt -> return ; | return expression ;
   * return-stmt -> return expr-gen
   * expr-gen -> expression ; | ;
@@ -35,8 +35,8 @@ return-stmt | switch-stmt
   * case-stmts -> case-stmt-rest
   * case-stmt-rest -> case-stmt case-stmt-rest | ϵ
     * => case-stmts -> case-stmt case-stmts | ϵ
-19. case-stmt -> case NUM : production-list
-20. default-stmt -> default : production-list | ϵ
+19. case-stmt -> case NUM : statement-list
+20. default-stmt -> default : statement-list | ϵ
 21. expression -> var = expression | simple-expression
 22. var -> ID | ID [expression]
   * var -> ID index
