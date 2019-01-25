@@ -62,6 +62,7 @@ public class LexicalAnalyzer {
 
     private int prev = -1;
     private char prevc = ' ';
+    @SuppressWarnings("Duplicates")
     public Token getToken() {
         StringBuilder raw = new StringBuilder();
         boolean found = false;
@@ -202,8 +203,8 @@ public class LexicalAnalyzer {
 
     // some testing
     public static void main(String[] args) {
-        LexicalAnalyzer a = new LexicalAnalyzer(new File("C:\\Users\\parha\\Desktop\\mai.c"));
-        for (int i = 0; i < 15; i++) {
+        LexicalAnalyzer a = new LexicalAnalyzer(new File("C:\\Users\\Shabnam\\Documents\\University\\Term 7\\Compiler\\Project\\test.c"));
+        for (int i = 0; i < 600; i++) {
             a.getToken();
         }
     }

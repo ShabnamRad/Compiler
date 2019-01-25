@@ -7,13 +7,13 @@ public class Token {
 
     private String lexeme, tokenName, type;
 
-    Token(String inp) {
+    public Token(String inp) {
         if (!checkSymbols(inp) && !checkReservedWord(inp)) {
             throw new Error("Token is identifier");
         }
     }
 
-    Token(String inp, String name, String type) {
+    public Token(String inp, String name, String type) {
         this.lexeme = inp;
         this.tokenName = name;
         this.type = type;
@@ -140,5 +140,20 @@ public class Token {
             this.lexeme = inp;
         }
         return val;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        try{
+            Token token = (Token) obj;
+            return token.lexeme.equals(this.lexeme) && token.tokenName.equals(this.tokenName) && token.type.equals(this.type);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + "(" + lexeme + ", " + tokenName + ", " + type + ")";
     }
 }

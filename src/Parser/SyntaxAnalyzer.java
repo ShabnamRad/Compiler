@@ -7,6 +7,7 @@ import java.util.Map;
 
 public class SyntaxAnalyzer {
     private ArrayList<Diagram> transitionDigrams;
+
     public SyntaxAnalyzer() {
         transitionDigrams = new ArrayList<>();
         Diagram program = new Diagram();
@@ -21,6 +22,8 @@ public class SyntaxAnalyzer {
         Diagram factor = new Diagram();
         transitionDigrams = new ArrayList<>(Arrays.asList(program, declaration_list, params, param, statement_list,
                 statement, expression, var, term, factor));
+
+        //Constructing Diagrams
         State state = new State(true);
         program.addState(state);
         Map<Edge, State> children = new HashMap<>();

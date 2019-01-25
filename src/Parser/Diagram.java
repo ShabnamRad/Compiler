@@ -1,6 +1,6 @@
 package Parser;
 
-import Scanner.Analyzer;
+import Scanner.LexicalAnalyzer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,20 +9,20 @@ import java.util.Map;
 /**
  * Created by Shabnam on 1/24/2019.
  */
-public class Diagram {
+class Diagram {
     private ArrayList<State> states;
     private State startState;
 
-    public Diagram() {
+    Diagram() {
         states = new ArrayList<>();
         startState = null;
     }
 
-    public void addState(State state) {
+    void addState(State state) {
         this.states.add(state);
     }
 
-    public ArrayList<State> getStates() {
+    ArrayList<State> getStates() {
         return states;
     }
 
@@ -32,17 +32,17 @@ public class Diagram {
         this.states.add(this.startState);
     }
 
-    public boolean traverse(Analyzer analyzer) {
+    public boolean traverse(LexicalAnalyzer lexicalAnalyzer) {
         State curr = this.startState;
         while(!curr.isEndState()) {
             boolean found = false;
-            String tokenName = analyzer.getToken().getTokenName();
+            String tokenName = lexicalAnalyzer.getToken().getTokenName();
             for (Edge edge : curr.getChildren().keySet()) {
                 if(edge.isDiagram()) {
                     Diagram candidateDiagram = edge.getDiagram();
                     //TODO: check for t in First
                     if (false) {
-                        if (!candidateDiagram.traverse(analyzer))
+                        if (!candidateDiagram.traverse(lexicalAnalyzer))
                             return false;
                         curr = curr.getChildren().get(edge);
                         found = true;
@@ -55,7 +55,7 @@ public class Diagram {
                         found = true;
                         break;
                     }
-                } else if (edge.getTokenName().equals(tokenName)) { //TODO: override equals of Token
+                } else if (edge.getTokenName().equals(tokenName)) {
                     curr = curr.getChildren().get(edge);
                     found = true;
                     break;
@@ -73,13 +73,17 @@ class State {
     private boolean startState = false;
     private boolean endState = false;
 
+    State() {
+        this.children = new HashMap<>();
+    }
+
     State(boolean endState) {
         this.children = new HashMap<>();
         if(endState)
             this.setAsEndState();
     }
 
-    public State(Map<Edge, State> children) {
+    State(Map<Edge, State> children) {
         this.children = children;
     }
 
@@ -87,8 +91,8 @@ class State {
         return children;
     }
 
-    public void setChildren(Map<Edge, State> children) {
-        this.children = children;
+    public void addChildren(Edge edge, State state) {
+        this.children.put(edge, state);
     }
 
     public boolean isStartState() {
@@ -113,12 +117,12 @@ class Edge {
     private String tokenName;
     private Diagram diagram;
 
-    public Edge(String tokenName) {
+    Edge(String tokenName) {
         isDiagram = false;
         this.tokenName = tokenName;
     }
 
-    public Edge(Diagram diagram) {
+    Edge(Diagram diagram) {
         isDiagram = true;
         this.diagram = diagram;
     }
