@@ -61,6 +61,48 @@ public class Grammar {
         productions.add(new Production(nonTerminals[0], new Token[]{nonTerminals[1], new Token("\uFFFF")}));
         productions.add(new Production(nonTerminals[1], new Token[]{nonTerminals[2], nonTerminals[1]}));
         productions.add(new Production(nonTerminals[1], new Token[]{new Token("\\eps")}));
+        productions.add(new Production(nonTerminals[2], new Token[]{nonTerminals[3]}));
+        productions.add(new Production(nonTerminals[2], new Token[]{nonTerminals[4]}));
+        productions.add(new Production(nonTerminals[3], new Token[]{
+                nonTerminals[5], new Token(null, "ID", "unknown"), nonTerminals[31]}));
+        productions.add(new Production(nonTerminals[31], new Token[]{new Token(";")}));
+        productions.add(new Production(nonTerminals[31], new Token[]{
+                new Token("["), new Token(null, "NUM", "INT"),
+                new Token("]"), new Token(";")}));
+        productions.add(new Production(nonTerminals[5], new Token[]{new Token("int")}));
+        productions.add(new Production(nonTerminals[5], new Token[]{new Token("void")}));
+        productions.add(new Production(nonTerminals[4], new Token[]{
+                nonTerminals[5], new Token(null, "ID", "unknown"),
+                new Token("("), nonTerminals[6], new Token(")"), nonTerminals[7]}));
+        productions.add(new Production(nonTerminals[6], new Token[]{nonTerminals[8]}));
+        productions.add(new Production(nonTerminals[6], new Token[]{new Token("void")}));
+        productions.add(new Production(nonTerminals[8], new Token[]{nonTerminals[9], nonTerminals[32]}));
+        productions.add(new Production(nonTerminals[32], new Token[]{
+                new Token(","), nonTerminals[9], nonTerminals[32]}));
+        productions.add(new Production(nonTerminals[32], new Token[]{new Token("\\eps")}));
+        productions.add(new Production(nonTerminals[9], new Token[]{
+                nonTerminals[5], new Token(null, "ID", "unknown"), nonTerminals[33]}));
+        productions.add(new Production(nonTerminals[33], new Token[]{new Token("["), new Token("]")}));
+        productions.add(new Production(nonTerminals[33], new Token[]{new Token("\\eps")}));
+        productions.add(new Production(nonTerminals[7], new Token[]{new Token("{"), nonTerminals[1], nonTerminals[10], new Token("}")}));
+        productions.add(new Production(nonTerminals[10], new Token[]{nonTerminals[11], nonTerminals[10]}));
+        productions.add(new Production(nonTerminals[10], new Token[]{new Token("\\eps")}));
+        productions.add(new Production(nonTerminals[11], new Token[]{nonTerminals[12]}));
+        productions.add(new Production(nonTerminals[11], new Token[]{nonTerminals[7]}));
+        productions.add(new Production(nonTerminals[11], new Token[]{nonTerminals[13]}));
+        productions.add(new Production(nonTerminals[11], new Token[]{nonTerminals[14]}));
+        productions.add(new Production(nonTerminals[11], new Token[]{nonTerminals[15]}));
+        productions.add(new Production(nonTerminals[11], new Token[]{nonTerminals[16]}));
+        productions.add(new Production(nonTerminals[12], new Token[]{nonTerminals[17], new Token(";")}));
+        productions.add(new Production(nonTerminals[12], new Token[]{new Token("continue"), new Token(";")}));
+        productions.add(new Production(nonTerminals[12], new Token[]{new Token("break"), new Token(";")}));
+        productions.add(new Production(nonTerminals[12], new Token[]{new Token(";")}));
+        productions.add(new Production(nonTerminals[13], new Token[]{
+                new Token("if"), new Token("("), nonTerminals[17],
+                new Token(")"), nonTerminals[11], new Token("else"), nonTerminals[11]}));
+        productions.add(new Production(nonTerminals[14], new Token[]{new Token("while"), new Token("("), nonTerminals[17], new Token(")"), nonTerminals[11]}));
+
+
 
     }
 
