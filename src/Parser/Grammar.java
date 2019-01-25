@@ -15,6 +15,7 @@ public class Grammar {
     private final ArrayList<Production> productions = new ArrayList<>();
     private final Token[] nonTerminals = new Token[40];
     private Map<Token, HashSet<Token>> firsts = new HashMap<>();
+    private Map<Token, HashSet<Token>> follows = new HashMap<>();
 
     private Grammar() {
         nonTerminals[0] = new Token(null, "program", "NONTERMINAL");
@@ -81,27 +82,72 @@ public class Grammar {
            if(production.nonTerminal.getTokenName().equals(token.getTokenName()))
                tokenProductions.add(production);
        }
-       for(Production production :tokenProductions) {
-           if(production.definitions.length == 1 && production.definitions[0].getTokenName().equals("epsilon"))
-               res.add(new Token("\\eps"));
-           int index = 1;
-           HashSet<Token> firstOfDef = first(production.definitions[0]);
-           int len = production.definitions.length;
-           while(firstOfDef.contains(new Token("\\eps")) && index < len) {
-               firstOfDef.remove(new Token("\\eps"));
-               res.addAll(firstOfDef);
-               firstOfDef = first(production.definitions[index]);
-               index++;
-           }
-           res.addAll(firstOfDef);
-       }
+       for(Production production :tokenProductions)
+           res.addAll(stringFirst(production.definitions));
        firsts.put(token, res);
        return res;
     }
 
-    public HashSet<Token> follow(Token token) {
+    private HashSet<Token> stringFirst(Token[] definitions) {
         HashSet<Token> res = new HashSet<>();
+        int len = definitions.length;
+        if(len == 1 && definitions[0].getTokenName().equals("epsilon")) {
+            res.add(new Token("\\eps"));
+            return res;
+        }
+        int index = 1;
+        HashSet<Token> firstOfDef = first(definitions[0]);
+        while(firstOfDef.contains(new Token("\\eps")) && index < len) {
+            firstOfDef.remove(new Token("\\eps"));
+            res.addAll(firstOfDef);
+            firstOfDef = first(definitions[index]);
+            index++;
+        }
+        res.addAll(firstOfDef);
         return res;
+    }
+
+    private HashSet<Token> follow(Token nonterminal) {
+        if(follows.containsKey(nonterminal))
+            return follows.get(nonterminal);
+        if(!nonterminal.getType().equals("NONTERMINAL")) {
+            throw new Error("follow is undefined for terminals");
+//            return new HashSet<>();
+        }
+        HashSet<Token> res = new HashSet<>();
+        if(nonterminal.equals(nonTerminals[0]))
+            res.add(new Token("$"));
+        for(Production production: productions) {
+            int NTIndex = findNonTerminal(production.definitions, nonterminal);
+            if(NTIndex == -1)
+                continue;
+            int len = production.definitions.length;
+            Token[] beta;
+            if(NTIndex + 1 == production.definitions.length)
+                beta = new Token[] {new Token("\\eps")};
+            else {
+                beta = new Token[len - NTIndex - 1];
+                for (int i = NTIndex + 1; i < len; i++) {
+                    beta[i - NTIndex - 1] = production.definitions[i];
+                }
+            }
+            HashSet<Token> firstBeta = stringFirst(beta);
+            if(firstBeta.contains(new Token("\\eps")) && !production.nonTerminal.equals(nonterminal))
+                res.addAll(follow(production.nonTerminal));
+            firstBeta.remove(new Token("\\eps"));
+            res.addAll(firstBeta);
+        }
+        return res;
+    }
+
+    private int findNonTerminal(Token[] definitions, Token nonTerminal) {
+        int index = 0;
+        for (Token definition : definitions) {
+            if (nonTerminal.equals(definition))
+                return index;
+            index ++;
+        }
+        return -1;
     }
 
     @Override
@@ -109,15 +155,13 @@ public class Grammar {
         StringBuilder grammarString = new StringBuilder();
         grammarString.append("NonTerminals: \n");
         for (Token nonTerminal : nonTerminals) {
-            if (nonTerminal != null) {
-                grammarString.append(nonTerminal.getTokenName()).append("\n");
-            }
+            if (nonTerminal == null)
+                break;
+            grammarString.append(nonTerminal.getTokenName()).append("\n");
         }
         grammarString.append("Grammar: \n");
         for (Production production : productions) {
-            if (production != null) {
-                grammarString.append(production.toString()).append("\n");
-            }
+            grammarString.append(production.toString()).append("\n");
         }
         return grammarString.toString();
     }
@@ -128,7 +172,8 @@ public class Grammar {
         for(Token nonTerminal: grammar.nonTerminals) {
             if(nonTerminal == null)
                 break;
-            System.out.println(grammar.first(nonTerminal));
+            System.out.println("First(" + nonTerminal.getTokenName() + ") = " + grammar.first(nonTerminal));
+            System.out.println("Follow(" + nonTerminal.getTokenName() + ") = " + grammar.follow(nonTerminal));
         }
     }
 }
@@ -146,9 +191,12 @@ class Production {
     public String toString() {
         StringBuilder definitionString = new StringBuilder();
         for (Token token : definitions) {
-            if (token != null) {
-                definitionString.append(token.getTokenName()).append(" ");
-            }
+            String name;
+            if(token.getType().equals("NONTERMINAL"))
+                name = token.getTokenName();
+            else
+                name = token.getLexeme();
+            definitionString.append(name).append(" ");
         }
         return nonTerminal.getTokenName() + " -> " + definitionString;
     }
