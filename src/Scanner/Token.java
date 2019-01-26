@@ -169,6 +169,6 @@ public class Token {
 
     @Override
     public String toString() {
-        return "( " + lexeme + ", " + tokenName + ", " + type + " )";
+        return tokenName;
     }
 }

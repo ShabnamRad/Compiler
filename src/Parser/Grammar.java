@@ -206,6 +206,20 @@ public class Grammar {
                 new Token(","), nonTerminals[17], nonTerminals[39]}));
         productions.add(new Production(nonTerminals[39], new Token[]{
                 new Token("\\eps")}));
+
+//        nonTerminals[0] = new Token(null, "E", "NONTERMINAL");
+//        nonTerminals[1] = new Token(null, "T", "NONTERMINAL");
+//        nonTerminals[2] = new Token(null, "Eprim", "NONTERMINAL");
+//        nonTerminals[3] = new Token(null, "Tprim", "NONTERMINAL");
+//        nonTerminals[4] = new Token(null, "F", "NONTERMINAL");
+//        productions.add(new Production(nonTerminals[0], new Token[] {nonTerminals[1], nonTerminals[2]}));
+//        productions.add(new Production(nonTerminals[2], new Token[] {new Token("+"), nonTerminals[1], nonTerminals[2]}));
+//        productions.add(new Production(nonTerminals[2], new Token[] {new Token("\\eps")}));
+//        productions.add(new Production(nonTerminals[1], new Token[] {nonTerminals[4], nonTerminals[3]}));
+//        productions.add(new Production(nonTerminals[3], new Token[] {new Token("*"), nonTerminals[4], nonTerminals[3]}));
+//        productions.add(new Production(nonTerminals[3], new Token[] {new Token("\\eps")}));
+//        productions.add(new Production(nonTerminals[4], new Token[] {new Token("("), nonTerminals[0], new Token(")")}));
+//        productions.add(new Production(nonTerminals[4], new Token[] {new Token(";")}));
     }
 
     static Grammar getInstance() {
@@ -242,8 +256,8 @@ public class Grammar {
         int index = 1;
         HashSet<Token> firstOfDef = first(definitions[0]);
         while(firstOfDef.contains(new Token("\\eps")) && index < len) {
-            firstOfDef.remove(new Token("\\eps"));
             res.addAll(firstOfDef);
+            res.remove(new Token("\\eps"));
             firstOfDef = first(definitions[index]);
             index++;
         }
@@ -255,18 +269,18 @@ public class Grammar {
         return follow(nonTerminal, new ArrayList<>());
     }
 
-    private HashSet<Token> follow(Token nonterminal, ArrayList<Token> waiting) {
-        if(follows.containsKey(nonterminal))
-            return follows.get(nonterminal);
-        if(!nonterminal.getType().equals("NONTERMINAL")) {
+    private HashSet<Token> follow(Token nonTerminal, ArrayList<Token> waiting) {
+        if(follows.containsKey(nonTerminal))
+            return follows.get(nonTerminal);
+        if(!nonTerminal.getType().equals("NONTERMINAL")) {
             throw new Error("follow is undefined for terminals");
 //            return new HashSet<>();
         }
         HashSet<Token> res = new HashSet<>();
-        if(nonterminal.equals(nonTerminals[0]))
+        if(nonTerminal.equals(nonTerminals[0]))
             res.add(new Token("$"));
         for(Production production: productions) {
-            int NTIndex = findNonTerminal(production.definitions, nonterminal);
+            int NTIndex = findNonTerminal(production.definitions, nonTerminal);
             if(NTIndex == -1)
                 continue;
             int len = production.definitions.length;
@@ -281,15 +295,15 @@ public class Grammar {
             }
             HashSet<Token> firstBeta = stringFirst(beta);
             if(firstBeta.contains(new Token("\\eps"))) {
-                waiting.add(production.nonTerminal);
-                if(!waiting.contains(nonterminal))
+                waiting.add(nonTerminal);
+                if(!waiting.contains(production.nonTerminal))
                     res.addAll(follow(production.nonTerminal, waiting));
-                waiting.remove(production.nonTerminal);
+                waiting.remove(nonTerminal);
             }
-            firstBeta.remove(new Token("\\eps"));
             res.addAll(firstBeta);
+            res.remove(new Token("\\eps"));
         }
-        follows.put(nonterminal, res);
+        follows.put(nonTerminal, res);
         return res;
     }
 
@@ -330,8 +344,8 @@ public class Grammar {
         for(Token nonTerminal: grammar.nonTerminals) {
             if(nonTerminal == null)
                 break;
-            System.out.println("First(" + nonTerminal.getTokenName() + ") = " + grammar.first(nonTerminal));
-            System.out.println("Follow(" + nonTerminal.getTokenName() + ") = " + grammar.follow(nonTerminal));
+            System.out.println("First(" + nonTerminal + ") = " + grammar.first(nonTerminal));
+            System.out.println("Follow(" + nonTerminal + ") = " + grammar.follow(nonTerminal));
         }
     }
 }
@@ -349,7 +363,7 @@ class Production {
     public String toString() {
         StringBuilder definitionString = new StringBuilder();
         for (Token token : definitions) {
-            definitionString.append(token.getTokenName()).append(" ");
+            definitionString.append(token).append(" ");
         }
         return nonTerminal.getTokenName() + " -> " + definitionString;
     }
