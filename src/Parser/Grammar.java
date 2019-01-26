@@ -279,40 +279,46 @@ public class Grammar {
         HashSet<Token> res = new HashSet<>();
         if(nonTerminal.equals(nonTerminals[0]))
             res.add(new Token("$"));
+        boolean forMe = true;
         for(Production production: productions) {
-            int NTIndex = findNonTerminal(production.definitions, nonTerminal);
-            if(NTIndex == -1)
-                continue;
-            int len = production.definitions.length;
-            Token[] beta;
-            if(NTIndex + 1 == production.definitions.length)
-                beta = new Token[] {new Token("\\eps")};
-            else {
-                beta = new Token[len - NTIndex - 1];
-                for (int i = NTIndex + 1; i < len; i++) {
-                    beta[i - NTIndex - 1] = production.definitions[i];
+            int NTIndex = -1;
+            while ((NTIndex = findNonTerminal(production.definitions, nonTerminal, NTIndex + 1)) != -1) {
+                int len = production.definitions.length;
+                Token[] beta;
+                if (NTIndex + 1 == production.definitions.length)
+                    beta = new Token[]{new Token("\\eps")};
+                else {
+                    beta = new Token[len - NTIndex - 1];
+                    for (int i = NTIndex + 1; i < len; i++) {
+                        beta[i - NTIndex - 1] = production.definitions[i];
+                    }
                 }
+                HashSet<Token> firstBeta = stringFirst(beta);
+                if (firstBeta.contains(new Token("\\eps"))) {
+                    waiting.add(nonTerminal);
+                    if (!waiting.contains(production.nonTerminal))
+                        res.addAll(follow(production.nonTerminal, waiting));
+                    else if (!nonTerminal.equals(waiting.get(0)))
+                        forMe = false;
+                    waiting.remove(nonTerminal);
+                }
+                res.addAll(firstBeta);
+                res.remove(new Token("\\eps"));
             }
-            HashSet<Token> firstBeta = stringFirst(beta);
-            if(firstBeta.contains(new Token("\\eps"))) {
-                waiting.add(nonTerminal);
-                if(!waiting.contains(production.nonTerminal))
-                    res.addAll(follow(production.nonTerminal, waiting));
-                waiting.remove(nonTerminal);
-            }
-            res.addAll(firstBeta);
-            res.remove(new Token("\\eps"));
         }
-        follows.put(nonTerminal, res);
+        if(forMe)
+            follows.put(nonTerminal, res);
         return res;
     }
 
     private int findNonTerminal(Token[] arr, Token nonTerminal) {
-        int index = 0;
-        for (Token element : arr) {
-            if (nonTerminal.equals(element))
-                return index;
-            index ++;
+        return findNonTerminal(arr, nonTerminal, 0);
+    }
+
+    private int findNonTerminal(Token[] arr, Token nonTerminal, int startIndex) {
+        for (int i = startIndex; i < arr.length; i++) {
+            if (nonTerminal.equals(arr[i]))
+                return i;
         }
         return -1;
     }
