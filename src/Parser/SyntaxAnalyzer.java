@@ -19,15 +19,14 @@ public class SyntaxAnalyzer {
         Diagram program = new Diagram("program");
         Diagram declaration_list = new Diagram("declaration-list");
         Diagram params = new Diagram("params");
-        Diagram param = new Diagram("param");
         Diagram statement_list = new Diagram("statement-list");
         Diagram statement = new Diagram("statement");
         Diagram expression = new Diagram("expression");
         Diagram var = new Diagram("var");
         Diagram term = new Diagram("term");
         Diagram factor = new Diagram("factor");
-        transitionDigrams = new ArrayList<>(Arrays.asList(program, declaration_list, params, param, statement_list,
-                statement, expression, var, term, factor));
+        transitionDigrams = new ArrayList<>(Arrays.asList(program, declaration_list, params, statement_list, statement,
+                expression, var, term, factor));
 
         //Constructing Diagrams
         State state = new State(true);

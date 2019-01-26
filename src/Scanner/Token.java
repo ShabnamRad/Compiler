@@ -100,43 +100,43 @@ public class Token {
         boolean val = true;
         switch (inp) {
             case "int":
-                this.tokenName = "Integer";
+                this.tokenName = "int";
                 this.type = "type-specifier";
                 break;
             case "void":
-                this.tokenName = "Void";
+                this.tokenName = "void";
                 this.type = "type-specifier";
                 break;
             case "continue":
-                this.tokenName = "Continue";
+                this.tokenName = "continue";
                 this.type = "loop-operator";
                 break;
             case "break":
-                this.tokenName = "Break";
+                this.tokenName = "break";
                 this.type = "loop-operator";
                 break;
             case "while":
-                this.tokenName = "While";
+                this.tokenName = "while";
                 this.type = "loop-operator";
                 break;
             case "if":
-                this.tokenName = "If";
+                this.tokenName = "if";
                 this.type = "conditional-operator";
                 break;
             case "else":
-                this.tokenName = "Else";
+                this.tokenName = "else";
                 this.type = "conditional-operator";
                 break;
             case "switch":
-                this.tokenName = "Switch";
+                this.tokenName = "switch";
                 this.type = "conditional-operator";
                 break;
             case "case":
-                this.tokenName = "Case";
+                this.tokenName = "case";
                 this.type = "conditional-operator";
                 break;
             case "default":
-                this.tokenName = "Default";
+                this.tokenName = "default";
                 this.type = "conditional-operator";
                 break;
             default:

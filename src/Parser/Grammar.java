@@ -149,7 +149,11 @@ public class Grammar {
         return res;
     }
 
-    HashSet<Token> follow(Token nonterminal) {
+    HashSet<Token> follow(Token nonTerminal) {
+        return follow(nonTerminal, new ArrayList<>());
+    }
+
+    private HashSet<Token> follow(Token nonterminal, ArrayList<Token> waiting) {
         if(follows.containsKey(nonterminal))
             return follows.get(nonterminal);
         if(!nonterminal.getType().equals("NONTERMINAL")) {
@@ -174,8 +178,12 @@ public class Grammar {
                 }
             }
             HashSet<Token> firstBeta = stringFirst(beta);
-            if(firstBeta.contains(new Token("\\eps")) && !production.nonTerminal.equals(nonterminal))
-                res.addAll(follow(production.nonTerminal));
+            if(firstBeta.contains(new Token("\\eps"))) {
+                waiting.add(production.nonTerminal);
+                if(!waiting.contains(nonterminal))
+                    res.addAll(follow(production.nonTerminal, waiting));
+                waiting.remove(production.nonTerminal);
+            }
             firstBeta.remove(new Token("\\eps"));
             res.addAll(firstBeta);
         }
