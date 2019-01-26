@@ -107,6 +107,10 @@ public class Token {
                 this.tokenName = "void";
                 this.type = "type-specifier";
                 break;
+            case "return":
+                this.tokenName = "return";
+                this.type = "function-operator";
+                break;
             case "continue":
                 this.tokenName = "continue";
                 this.type = "loop-operator";
