@@ -16,6 +16,8 @@ public class LexicalAnalyzer {
     private String cline;
     private int index, lnum;
     private HashSet<Character> SpecialChars;
+    private boolean repeatToken;
+    private Token lastToken;
 
     public LexicalAnalyzer(File f) {
         try {
@@ -57,7 +59,6 @@ public class LexicalAnalyzer {
             }
             else {
                 endOfInput = true;
-//                System.out.println("end of input");
                 return (char) -1;
             }
         }
@@ -71,6 +72,10 @@ public class LexicalAnalyzer {
     private boolean end = false;
     @SuppressWarnings("Duplicates")
     public Token getToken() {
+        if (repeatToken) {
+            repeatToken = false;
+            return lastToken;
+        }
         StringBuilder raw = new StringBuilder();
         boolean found = false;
         int current = -1; //-1: unknown/eof, 0: string, 1: number, 2: mixed, 3: special char, 4: relop, 5: comment
@@ -79,7 +84,6 @@ public class LexicalAnalyzer {
         do {
             if (end) throw new Error("Input has ended");
             char c = getChar();
-//            System.out.println((int) c);
             if (c == (char) -1) {
                 raw.append(c);
                 found = true;
@@ -194,18 +198,29 @@ public class LexicalAnalyzer {
 
     private Token Tokenize(String inp, int c) {
         try {
-            return new Token(inp);
+            lastToken = new Token(inp);
+            return lastToken;
         } catch (Error e1) {
             try {
+                lastToken = SymbolTable.get(inp);
                 return SymbolTable.get(inp);
             } catch (Error e2) {
                 String name = c == 1? "NUM":"ID";
                 String type = c == 1? "INT":"unknown";
                 Token t = new Token(inp, name, type);
-//                System.out.println("\tnew identifier");
                 SymbolTable.add(t);
+                lastToken = t;
                 return t;
             }
+        }
+    }
+
+    public void setRepeatToken() { repeatToken = true; }
+
+    public static void main(String[] args) {
+        LexicalAnalyzer a = new LexicalAnalyzer(new File("C:\\Users\\parha\\Desktop\\main.c"));
+        for (int i = 0; i < 550; i++) {
+            a.getToken();
         }
     }
 }
