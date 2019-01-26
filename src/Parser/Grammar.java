@@ -323,11 +323,6 @@ public class Grammar {
         return -1;
     }
 
-    Token getDiagramNonTerminal(Diagram diagram) {
-        int index = findNonTerminal(nonTerminals, new Token(null, diagram.getName(), "NONTERMINAL"));
-        return nonTerminals[index];
-    }
-
     @Override
     public String toString() {
         StringBuilder grammarString = new StringBuilder();
