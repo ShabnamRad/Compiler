@@ -15,29 +15,6 @@ public class SyntaxAnalyzer {
 
     }
 
-    private boolean call(String functionName) {
-        switch (functionName) {
-            case "program":
-                return program();
-            case "declaration-list":
-                return declaration_list();
-            case "params":
-                return params();
-            case "statement":
-                return statement();
-            case "expression":
-                return expression();
-            case "term":
-                return term();
-            case "factor":
-                return factor();
-            case "statement-list":
-                return statement_list();
-            default:
-                return false;
-        }
-    }
-
     private boolean program() {
         return true;
     }
@@ -46,12 +23,11 @@ public class SyntaxAnalyzer {
         return true;
     }
 
-    @SuppressWarnings("Duplicates")
+    @SuppressWarnings("all")
     private boolean params() {
         Token diagramNonTerminal = new Token(null, "params", "NONTERMINAL");
         HashSet<Token> follow = grammar.follow(diagramNonTerminal);
         int state = 0;
-        whileLoop:
         while (true) {
             Token token = lexicalAnalyzer.getToken();
             String tokenName = token.getTokenName();
@@ -65,7 +41,7 @@ public class SyntaxAnalyzer {
                             state = 6;
                             break;
                         default:
-                            throw new Error("panic! edge not found");
+                            return false;
                     }
                     break;
                 case 1:
@@ -74,7 +50,7 @@ public class SyntaxAnalyzer {
                             state = 2;
                             break;
                         default:
-                            throw new Error("panic! edge not found");
+                            return false;
                     }
                     break;
                 case 2:
@@ -90,7 +66,7 @@ public class SyntaxAnalyzer {
                                 state = 7;
                                 lexicalAnalyzer.setRepeatToken();
                             } else
-                                throw new Error("panic! edge not found");
+                                return false;
                     }
                     break;
                 case 3:
@@ -99,7 +75,7 @@ public class SyntaxAnalyzer {
                             state = 4;
                             break;
                         default:
-                            throw new Error("panic! edge not found");
+                            return false;
                     }
                     break;
                 case 4:
@@ -112,7 +88,7 @@ public class SyntaxAnalyzer {
                                 state = 7;
                                 lexicalAnalyzer.setRepeatToken();
                             } else
-                                throw new Error("panic! edge not found");
+                                return false;
                     }
                     break;
                 case 5:
@@ -122,7 +98,7 @@ public class SyntaxAnalyzer {
                             state = 1;
                             break;
                         default:
-                            throw new Error("panic! edge not found");
+                            return false;
                     }
                     break;
                 case 6:
@@ -135,14 +111,15 @@ public class SyntaxAnalyzer {
                                 state = 7;
                                 lexicalAnalyzer.setRepeatToken();
                             } else
-                                throw new Error("panic! edge not found"); //TODO: maybe return false?
+                                return false;
                     }
                     break;
                 case 7:
-                    break whileLoop;
+                    return true;
+                default:
+                    return false;
             }
         }
-        return true;
     }
 
     private boolean statement() {
@@ -150,19 +127,232 @@ public class SyntaxAnalyzer {
     }
 
     private boolean expression() {
-        return true;
-    }
-
-    private boolean term() {
-        Token diagramNonTerminal = new Token(null, "term", "NONTERMINAL");
+        Token diagramNonTerminal = new Token(null, "expression", "NONTERMINAL");
         HashSet<Token> follow = grammar.follow(diagramNonTerminal);
         int state = 0;
-        whileLoop:
         while (true) {
             Token token = lexicalAnalyzer.getToken();
             String tokenName = token.getTokenName();
             switch (state) {
                 case 0:
+                    switch (tokenName) {
+                        case "(":
+                            state = 1;
+                            break;
+                        case "NUM":
+                            state = 9;
+                            break;
+                        case "ID":
+                            state = 4;
+                            break;
+                        default:
+                            return false;
+                    }
+                    break;
+                case 1:
+                    if (grammar.first(new Token("expression")).contains(token)) {
+                        lexicalAnalyzer.setRepeatToken();
+                        if (expression())
+                            state = 2;
+                        else
+                            return false;
+                    } else
+                        return false;
+                    break;
+                case 2:
+                    switch (tokenName) {
+                        case ")":
+                            state = 9;
+                            break;
+                        default:
+                            return false;
+                    }
+                    break;
+                case 3:
+                    switch (tokenName) {
+                        case ")":
+                            state = 9;
+                            break;
+                        default:
+                            if (grammar.first(new Token("expression")).contains(token)) {
+                                lexicalAnalyzer.setRepeatToken();
+                                if (expression())
+                                    state = 8;
+                                else
+                                    return false;
+                            } else
+                                return false;
+                    }
+                    break;
+                case 4:
+                    switch (tokenName) {
+                        case "=":
+                            state = 0;
+                            break;
+                        case "(":
+                            state = 3;
+                            break;
+                        case "[":
+                            state = 5;
+                            break;
+                        default:
+                            return false;
+                    }
+                    break;
+                case 5:
+                    if (grammar.first(new Token("expression")).contains(token)) {
+                        lexicalAnalyzer.setRepeatToken();
+                        if (expression())
+                            state = 6;
+                        else
+                            return false;
+                    } else
+                        return false;
+                    break;
+                case 6:
+                    switch (tokenName) {
+                        case "]":
+                            state = 7;
+                            break;
+                        default:
+                            return false;
+                    }
+                    break;
+                case 7:
+                    switch (tokenName) {
+                        case "=":
+                            state = 0;
+                            break;
+                        default:
+                            return false;
+                    }
+                    break;
+                case 8:
+                    switch (tokenName) {
+                        case ")":
+                            state = 9;
+                            break;
+                        case ",":
+                            state = 11;
+                            break;
+                        default:
+                            return false;
+                    }
+                    break;
+                case 9:
+                    switch (tokenName) {
+                        case "*":
+                            state = 10;
+                            break;
+                        case "+":
+                        case "-":
+                            state = 16;
+                            break;
+                        default:
+                            if (follow.contains(token)) {
+                                state = 15;
+                                lexicalAnalyzer.setRepeatToken();
+                            } else
+                                return false;
+                    }
+                    break;
+                case 10:
+                    if (grammar.first(new Token("factor")).contains(token)) {
+                        lexicalAnalyzer.setRepeatToken();
+                        if (factor())
+                            state = 9;
+                        else
+                            return false;
+                    } else
+                        return false;
+                    break;
+                case 11:
+                    if (grammar.first(new Token("expression")).contains(token)) {
+                        lexicalAnalyzer.setRepeatToken();
+                        if (expression())
+                            state = 8;
+                        else
+                            return false;
+                    } else
+                        return false;
+                    break;
+                case 12:
+                    switch (tokenName) {
+                        case "<":
+                        case "==":
+                            state = 13;
+                            break;
+                        default:
+                            if (follow.contains(token)) {
+                                state = 15;
+                                lexicalAnalyzer.setRepeatToken();
+                            } else
+                                return false;
+                    }
+                    break;
+                case 13:
+                    if (grammar.first(new Token("term")).contains(token)) {
+                        lexicalAnalyzer.setRepeatToken();
+                        if (term())
+                            state = 14;
+                        else
+                            return false;
+                    } else
+                        return false;
+                    break;
+                case 14:
+                    switch (tokenName) {
+                        case "+":
+                        case "-":
+                            state = 17;
+                            break;
+                        default:
+                            if (follow.contains(token)) {
+                                state = 15;
+                                lexicalAnalyzer.setRepeatToken();
+                            } else
+                                return false;
+                    }
+                    break;
+                case 15:
+                    return true;
+                case 16:
+                    if (grammar.first(new Token("term")).contains(token)) {
+                        lexicalAnalyzer.setRepeatToken();
+                        if (term())
+                            state = 12;
+                        else
+                            return false;
+                    } else
+                        return false;
+                    break;
+                case 17:
+                    if (grammar.first(new Token("term")).contains(token)) {
+                        lexicalAnalyzer.setRepeatToken();
+                        if (term())
+                            state = 14;
+                        else
+                            return false;
+                    } else
+                        return false;
+                    break;
+                default:
+                    return false;
+            }
+        }
+    }
+
+    @SuppressWarnings("all")
+    private boolean term() {
+        Token diagramNonTerminal = new Token(null, "term", "NONTERMINAL");
+        HashSet<Token> follow = grammar.follow(diagramNonTerminal);
+        int state = 0;
+        while (true) {
+            Token token = lexicalAnalyzer.getToken();
+            String tokenName = token.getTokenName();
+            switch (state) {
+                case 0:
+                case 3:
                     if (grammar.first(new Token("factor")).contains(token)) {
                         lexicalAnalyzer.setRepeatToken();
                         if (factor())
@@ -186,12 +376,126 @@ public class SyntaxAnalyzer {
                     }
                     break;
                 case 2:
-                    break whileLoop;
-                case 3:
-                    if (grammar.first(new Token("factor")).contains(token)) {
-                        lexicalAnalyzer.setRepeatToken();
-                        if (factor())
+                    return true;
+                default:
+                    return false;
+            }
+        }
+    }
+
+    @SuppressWarnings("all")
+    private boolean factor() {
+        Token diagramNonTerminal = new Token(null, "term", "NONTERMINAL");
+        HashSet<Token> follow = grammar.follow(diagramNonTerminal);
+        int state = 0;
+        while (true) {
+            Token token = lexicalAnalyzer.getToken();
+            String tokenName = token.getTokenName();
+            switch (state) {
+                case 0:
+                    switch (tokenName) {
+                        case "(":
                             state = 1;
+                            break;
+                        case "NUM":
+                            state = 3;
+                            break;
+                        case "ID":
+                            state = 4;
+                            break;
+                        default:
+                            return false;
+                    }
+                    break;
+                case 1:
+                    if (grammar.first(new Token("expression")).contains(token)) {
+                        lexicalAnalyzer.setRepeatToken();
+                        if (expression())
+                            state = 2;
+                        else
+                            return false;
+                    } else
+                        return false;
+                    break;
+                case 2:
+                    switch (tokenName) {
+                        case ")":
+                            state = 3;
+                            break;
+                        default:
+                            return false;
+                    }
+                    break;
+                case 3:
+                    return true;
+                case 4:
+                    switch (tokenName) {
+                        case "[":
+                            state = 5;
+                            break;
+                        case "(":
+                            state = 7;
+                            break;
+                        default:
+                            if (follow.contains(token)) {
+                                state = 3;
+                                lexicalAnalyzer.setRepeatToken();
+                            } else
+                                return false;
+                    }
+                    break;
+                case 5:
+                    if (grammar.first(new Token("expression")).contains(token)) {
+                        lexicalAnalyzer.setRepeatToken();
+                        if (expression())
+                            state = 6;
+                        else
+                            return false;
+                    } else
+                        return false;
+                    break;
+                case 6:
+                    switch (tokenName) {
+                        case "]":
+                            state = 3;
+                            break;
+                        default:
+                            return false;
+                    }
+                    break;
+                case 7:
+                    switch (tokenName) {
+                        case ")":
+                            state = 3;
+                            break;
+                        default:
+                            if (grammar.first(new Token("expression")).contains(token)) {
+                                lexicalAnalyzer.setRepeatToken();
+                                if (expression())
+                                    state = 8;
+                                else
+                                    return false;
+                            } else
+                                return false;
+                    }
+                    break;
+                case 8:
+                    switch (tokenName) {
+                        case ",":
+                            state = 9;
+                            break;
+                        case ")":
+                            state = 3;
+                            break;
+                        default:
+                            return false;
+                    }
+                    break;
+                case 9:
+                    if (grammar.first(new Token("expression")).contains(token)) {
+                        lexicalAnalyzer.setRepeatToken();
+                        if (expression())
+                            state = 8;
                         else
                             return false;
                     } else
@@ -201,11 +505,6 @@ public class SyntaxAnalyzer {
                     return false;
             }
         }
-        return true;
-    }
-
-    private boolean factor() {
-        return true;
     }
 
     private boolean statement_list() {
