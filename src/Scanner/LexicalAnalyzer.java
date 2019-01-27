@@ -65,7 +65,7 @@ public class LexicalAnalyzer {
         return cline.charAt(index - 1);
     }
 
-    public void returnLastChar() {index --;}
+    private void returnLastChar() {index --;}
 
     private int prev = -1;
     private char prevc = ' ';
