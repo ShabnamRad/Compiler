@@ -11,7 +11,7 @@ public class SyntaxAnalyzer {
 
     public SyntaxAnalyzer(LexicalAnalyzer lexicalAnalyzer) {
         this.lexicalAnalyzer = lexicalAnalyzer;
-        if(program())
+        if (program())
             System.out.println("input parsed successfully");
         else
             System.out.println("parsing encountered an error");
@@ -511,6 +511,43 @@ public class SyntaxAnalyzer {
     }
 
     private boolean statement_list() {
-        return true;
+        Token diagramNonTerminal = new Token(null, "term", "NONTERMINAL");
+        HashSet<Token> follow = grammar.follow(diagramNonTerminal);
+        int state = 0;
+        while (true) {
+            Token token = lexicalAnalyzer.getToken();
+            switch (state) {
+                case 0:
+                    if (grammar.first(new Token("statement")).contains(token)) {
+                        lexicalAnalyzer.setRepeatToken();
+                        if (statement())
+                            state = 1;
+                        else
+                            return false;
+                    } else if (follow.contains(token)) {
+                        state = 2;
+                        lexicalAnalyzer.setRepeatToken();
+                    } else
+                        return false;
+                    break;
+                case 1:
+                    if (grammar.first(new Token("statement")).contains(token)) {
+                        lexicalAnalyzer.setRepeatToken();
+                        if (statement())
+                            state = 0;
+                        else
+                            return false;
+                    } else if (follow.contains(token)) {
+                        state = 2;
+                        lexicalAnalyzer.setRepeatToken();
+                    } else
+                        return false;
+                    break;
+                case 2:
+                    return true;
+                default:
+                    return false;
+            }
+        }
     }
 }
