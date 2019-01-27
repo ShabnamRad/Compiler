@@ -14,7 +14,7 @@ public class Main {
             return;
         }
 
-        LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(new File("C:\\Users\\Shabnam\\Documents\\University\\Term 7\\Compiler\\Project\\test.c"/*args[0]*/));
+        LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(new File(args[0]));
         SyntaxAnalyzer syntaxAnalyzer = new SyntaxAnalyzer(lexicalAnalyzer);
     }
 }

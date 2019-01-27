@@ -17,21 +17,24 @@ public class SyntaxAnalyzer {
             System.out.println("parsing encountered an error");
     }
 
+    @SuppressWarnings("all")
     private boolean program() {
         int state = 0;
         while (true) {
+            if (state == 2)
+                return true;
             Token token = lexicalAnalyzer.getToken();
             String tokenName = token.getTokenName();
             switch (state) {
                 case 0:
-                    if (grammar.first(new Token(null, "declaration-list", "NONTERMINAL")).contains(token)) {
+                    Token withEpsilon = new Token(null, "declaration-list", "NONTERMINAL");
+                    if (grammar.first(withEpsilon).contains(token) || grammar.follow(withEpsilon).contains(token)) {
                         lexicalAnalyzer.setRepeatToken();
                         if (declaration_list())
                             state = 1;
                         else
                             return false;
-                    }
-                    else
+                    } else
                         return false;
                     break;
                 case 1:
@@ -43,19 +46,20 @@ public class SyntaxAnalyzer {
                             return false;
                     }
                     break;
-                case 2:
-                    return true;
                 default:
                     return false;
             }
         }
     }
 
+    @SuppressWarnings("all")
     private boolean declaration_list() {
         Token diagramNonTerminal = new Token(null, "declaration-list", "NONTERMINAL");
         HashSet<Token> follow = grammar.follow(diagramNonTerminal);
         int state = 0;
         while (true) {
+            if (state == 6)
+                return true;
             Token token = lexicalAnalyzer.getToken();
             String tokenName = token.getTokenName();
             switch (state) {
@@ -69,8 +73,7 @@ public class SyntaxAnalyzer {
                             if (follow.contains(token)) {
                                 state = 6;
                                 lexicalAnalyzer.setRepeatToken();
-                            }
-                            else
+                            } else
                                 return false;
                     }
                     break;
@@ -125,18 +128,14 @@ public class SyntaxAnalyzer {
                             return false;
                     }
                     break;
-                case 6:
-                    return true;
                 case 7:
                     if (grammar.first(new Token(null, "params", "NONTERMINAL")).contains(token)) {
                         lexicalAnalyzer.setRepeatToken();
                         if (params()) {
                             state = 8;
-                        }
-                        else
+                        } else
                             return false;
-                    }
-                    else
+                    } else
                         return false;
                     break;
                 case 8:
@@ -158,38 +157,38 @@ public class SyntaxAnalyzer {
                     }
                     break;
                 case 10:
-                    if (grammar.first(new Token(null, "declaration-list", "NONTERMINAL")).contains(token)) {
+                    Token withEpsilon = new Token(null, "declaration-list", "NONTERMINAL");
+                    if (grammar.first(withEpsilon).contains(token) || grammar.follow(withEpsilon).contains(token)) {
                         lexicalAnalyzer.setRepeatToken();
                         if (declaration_list()) {
                             state = 12;
-                        }
-                        else
+                        } else
                             return false;
-                    }
-                    else
+                    } else
                         return false;
                     break;
                 case 11:
-                    if (grammar.first(new Token(null, "statement-list", "NONTERMINAL")).contains(token)) {
-                        lexicalAnalyzer.setRepeatToken();
-                        if (statement_list()) {
-                            state = 0;
-                        }
-                        else
-                            return false;
-                    }
-                    else
-                        return false;
-                    break;
-                case 12:
                     switch (tokenName) {
                         case "}":
-                            state = 11;
+                            state = 0;
                             break;
                         default:
                             return false;
                     }
                     break;
+                case 12:
+                    Token withEpsilon2 = new Token(null, "statement-list", "NONTERMINAL");
+                    if (grammar.first(withEpsilon2).contains(token) || grammar.follow(withEpsilon2).contains(token)) {
+                        lexicalAnalyzer.setRepeatToken();
+                        if (statement_list()) {
+                            state = 11;
+                        } else
+                            return false;
+                    } else
+                        return false;
+                    break;
+                default:
+                    return false;
             }
         }
     }
@@ -200,6 +199,8 @@ public class SyntaxAnalyzer {
         HashSet<Token> follow = grammar.follow(diagramNonTerminal);
         int state = 0;
         while (true) {
+            if (state == 7)
+                return true;
             Token token = lexicalAnalyzer.getToken();
             String tokenName = token.getTokenName();
             switch (state) {
@@ -285,19 +286,18 @@ public class SyntaxAnalyzer {
                                 return false;
                     }
                     break;
-                case 7:
-                    return true;
                 default:
                     return false;
             }
         }
     }
 
+    @SuppressWarnings("all")
     private boolean statement() {
-        Token diagramNonTerminal = new Token(null, "expression", "NONTERMINAL");
-        HashSet<Token> follow = grammar.follow(diagramNonTerminal);
         int state = 0;
         while (true) {
+            if (state == 2)
+                return true;
             Token token = lexicalAnalyzer.getToken();
             String tokenName = token.getTokenName();
             switch (state) {
@@ -322,16 +322,17 @@ public class SyntaxAnalyzer {
                         case "switch":
                             state = 15;
                             break;
+                        case "{":
+                            state = 26;
+                            break;
                         default:
                             if (grammar.first(new Token(null, "expression", "NONTERMINAL")).contains(token)) {
                                 lexicalAnalyzer.setRepeatToken();
                                 if (expression()) {
                                     state = 1;
-                                }
-                                else
+                                } else
                                     return false;
-                            }
-                            else
+                            } else
                                 return false;
                             break;
                     }
@@ -346,8 +347,6 @@ public class SyntaxAnalyzer {
                             return false;
                     }
                     break;
-                case 2:
-                    return true;
                 case 3:
                     switch (tokenName) {
                         case "(":
@@ -362,11 +361,9 @@ public class SyntaxAnalyzer {
                         lexicalAnalyzer.setRepeatToken();
                         if (expression()) {
                             state = 5;
-                        }
-                        else
+                        } else
                             return false;
-                    }
-                    else
+                    } else
                         return false;
                     break;
                 case 5:
@@ -383,11 +380,9 @@ public class SyntaxAnalyzer {
                         lexicalAnalyzer.setRepeatToken();
                         if (statement()) {
                             state = 7;
-                        }
-                        else
+                        } else
                             return false;
-                    }
-                    else
+                    } else
                         return false;
                     break;
                 case 7:
@@ -405,11 +400,9 @@ public class SyntaxAnalyzer {
                         lexicalAnalyzer.setRepeatToken();
                         if (statement()) {
                             state = 2;
-                        }
-                        else
+                        } else
                             return false;
-                    }
-                    else
+                    } else
                         return false;
                     break;
                 case 9:
@@ -426,11 +419,9 @@ public class SyntaxAnalyzer {
                         lexicalAnalyzer.setRepeatToken();
                         if (expression()) {
                             state = 11;
-                        }
-                        else
+                        } else
                             return false;
-                    }
-                    else
+                    } else
                         return false;
                     break;
                 case 11:
@@ -452,11 +443,9 @@ public class SyntaxAnalyzer {
                                 lexicalAnalyzer.setRepeatToken();
                                 if (expression()) {
                                     state = 14;
-                                }
-                                else
+                                } else
                                     return false;
-                            }
-                            else
+                            } else
                                 return false;
                             break;
                     }
@@ -475,11 +464,9 @@ public class SyntaxAnalyzer {
                         lexicalAnalyzer.setRepeatToken();
                         if (expression()) {
                             state = 17;
-                        }
-                        else
+                        } else
                             return false;
-                    }
-                    else
+                    } else
                         return false;
                     break;
                 case 17:
@@ -525,15 +512,14 @@ public class SyntaxAnalyzer {
                     }
                     break;
                 case 21:
-                    if (grammar.first(new Token(null, "statement-list", "NONTERMINAL")).contains(token)) {
+                    Token withEpsilon2 = new Token(null, "statement-list", "NONTERMINAL");
+                    if (grammar.first(withEpsilon2).contains(token) || grammar.follow(withEpsilon2).contains(token)) {
                         lexicalAnalyzer.setRepeatToken();
                         if (statement_list()) {
                             state = 22;
-                        }
-                        else
+                        } else
                             return false;
-                    }
-                    else
+                    } else
                         return false;
                     break;
                 case 22:
@@ -564,16 +550,46 @@ public class SyntaxAnalyzer {
                     }
                     break;
                 case 25:
-                    if (grammar.first(new Token(null, "statement-list", "NONTERMINAL")).contains(token)) {
+                    Token withEpsilon3 = new Token(null, "declaration-list", "NONTERMINAL");
+                    if (grammar.first(withEpsilon3).contains(token) || grammar.follow(withEpsilon3).contains(token)) {
                         lexicalAnalyzer.setRepeatToken();
                         if (statement_list()) {
                             state = 19;
-                        }
+                        } else
+                            return false;
+                    } else
+                        return false;
+                    break;
+                case 26:
+                    Token withEpsilon = new Token(null, "declaration-list", "NONTERMINAL");
+                    if (grammar.first(withEpsilon).contains(token) || grammar.follow(withEpsilon).contains(token)) {
+                        lexicalAnalyzer.setRepeatToken();
+                        if (declaration_list())
+                            state = 27;
                         else
                             return false;
-                    }
-                    else
+                    } else
                         return false;
+                    break;
+                case 27:
+                    Token withEpsilon4 = new Token(null, "statement-list", "NONTERMINAL");
+                    if (grammar.first(withEpsilon4).contains(token) || grammar.follow(withEpsilon4).contains(token)) {
+                        lexicalAnalyzer.setRepeatToken();
+                        if (statement_list()) {
+                            state = 28;
+                        } else
+                            return false;
+                    } else
+                        return false;
+                    break;
+                case 28:
+                    switch (tokenName) {
+                        case "}":
+                            state = 2;
+                            break;
+                        default:
+                            return false;
+                    }
                     break;
                 default:
                     return false;
@@ -587,6 +603,8 @@ public class SyntaxAnalyzer {
         HashSet<Token> follow = grammar.follow(diagramNonTerminal);
         int state = 0;
         while (true) {
+            if (state == 15)
+                return true;
             Token token = lexicalAnalyzer.getToken();
             String tokenName = token.getTokenName();
             switch (state) {
@@ -651,8 +669,23 @@ public class SyntaxAnalyzer {
                         case "[":
                             state = 5;
                             break;
+                        case "*":
+                            state = 10;
+                            break;
+                        case "+":
+                        case "-":
+                            state = 16;
+                            break;
+                        case "<":
+                        case "==":
+                            state = 13;
+                            break;
                         default:
-                            return false;
+                            if (follow.contains(token)) {
+                                state = 15;
+                                lexicalAnalyzer.setRepeatToken();
+                            } else
+                                return false;
                     }
                     break;
                 case 5:
@@ -679,8 +712,23 @@ public class SyntaxAnalyzer {
                         case "=":
                             state = 0;
                             break;
+                        case "*":
+                            state = 10;
+                            break;
+                        case "+":
+                        case "-":
+                            state = 16;
+                            break;
+                        case "<":
+                        case "==":
+                            state = 13;
+                            break;
                         default:
-                            return false;
+                            if (follow.contains(token)) {
+                                state = 15;
+                                lexicalAnalyzer.setRepeatToken();
+                            } else
+                                return false;
                     }
                     break;
                 case 8:
@@ -703,6 +751,10 @@ public class SyntaxAnalyzer {
                         case "+":
                         case "-":
                             state = 16;
+                            break;
+                        case "<":
+                        case "==":
+                            state = 13;
                             break;
                         default:
                             if (follow.contains(token)) {
@@ -770,8 +822,6 @@ public class SyntaxAnalyzer {
                                 return false;
                     }
                     break;
-                case 15:
-                    return true;
                 case 16:
                     if (grammar.first(new Token(null, "term", "NONTERMINAL")).contains(token)) {
                         lexicalAnalyzer.setRepeatToken();
@@ -804,6 +854,8 @@ public class SyntaxAnalyzer {
         HashSet<Token> follow = grammar.follow(diagramNonTerminal);
         int state = 0;
         while (true) {
+            if (state == 2)
+                return true;
             Token token = lexicalAnalyzer.getToken();
             String tokenName = token.getTokenName();
             switch (state) {
@@ -831,8 +883,6 @@ public class SyntaxAnalyzer {
                                 return false;
                     }
                     break;
-                case 2:
-                    return true;
                 default:
                     return false;
             }
@@ -845,6 +895,8 @@ public class SyntaxAnalyzer {
         HashSet<Token> follow = grammar.follow(diagramNonTerminal);
         int state = 0;
         while (true) {
+            if (state == 3)
+                return true;
             Token token = lexicalAnalyzer.getToken();
             String tokenName = token.getTokenName();
             switch (state) {
@@ -882,8 +934,6 @@ public class SyntaxAnalyzer {
                             return false;
                     }
                     break;
-                case 3:
-                    return true;
                 case 4:
                     switch (tokenName) {
                         case "[":
@@ -964,10 +1014,12 @@ public class SyntaxAnalyzer {
     }
 
     private boolean statement_list() {
-        Token diagramNonTerminal = new Token(null, "term", "NONTERMINAL");
+        Token diagramNonTerminal = new Token(null, "statement-list", "NONTERMINAL");
         HashSet<Token> follow = grammar.follow(diagramNonTerminal);
         int state = 0;
         while (true) {
+            if (state == 2)
+                return true;
             Token token = lexicalAnalyzer.getToken();
             switch (state) {
                 case 0:
@@ -996,8 +1048,6 @@ public class SyntaxAnalyzer {
                     } else
                         return false;
                     break;
-                case 2:
-                    return true;
                 default:
                     return false;
             }
