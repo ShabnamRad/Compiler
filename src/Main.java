@@ -1,3 +1,4 @@
+import CodeGeneration.CodeGen;
 import Parser.Grammar;
 import Parser.SyntaxAnalyzer;
 import Scanner.LexicalAnalyzer;
@@ -15,6 +16,10 @@ public class Main {
         }
 
         LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(new File(args[0]));
-        SyntaxAnalyzer syntaxAnalyzer = new SyntaxAnalyzer(lexicalAnalyzer);
+        new SyntaxAnalyzer(lexicalAnalyzer);
+        for (int i = 0; i < 10; i++) {
+            System.out.print(i + "\t");
+            System.out.println(CodeGen.ProgramBlock[i]);
+        }
     }
 }

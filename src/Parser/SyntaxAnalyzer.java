@@ -6,13 +6,14 @@ import CodeGeneration.SemanticAnalyzer;
 import CodeGeneration.CodeGen;
 
 import java.util.HashSet;
-import java.util.Stack;
 
 public class SyntaxAnalyzer {
     private LexicalAnalyzer lexicalAnalyzer;
     private SemanticAnalyzer semanticAnalyzer;
     private CodeGen codeGen;
     private Grammar grammar = Grammar.getInstance();
+
+    private static int switchOrWhile = -1;
 
     public SyntaxAnalyzer(LexicalAnalyzer lexicalAnalyzer) {
         this.lexicalAnalyzer = lexicalAnalyzer;
@@ -343,19 +344,23 @@ public class SyntaxAnalyzer {
                             break;
                         case "continue": // CODE GEN: jump address of start of while
                         case "break": // CODE GEN: savejump to address of end of while/switch
+                            codeGen.jpTop(switchOrWhile);
                             state = 1;
                             break;
                         case "if":
                             state = 3;
                             break;
                         case "while":
-                            codeGen.label();
+                            switchOrWhile = 0;
+                            codeGen.while_label();
                             state = 9;
                             break;
                         case "return":
                             state = 13;
                             break;
                         case "switch":
+                            switchOrWhile = 1;
+                            codeGen.switchInit();
                             state = 15;
                             break;
                         case "{":
@@ -409,7 +414,8 @@ public class SyntaxAnalyzer {
                 case 5:
                     // CODE GEN: evaluate expression and jmpsave if false
                     switch (tokenName) {
-                        case ")": // CODE GEN: if jump save operations here
+                        case ")":
+                            codeGen.if_save();
                             state = 6;
                             break;
                         default:
@@ -430,7 +436,8 @@ public class SyntaxAnalyzer {
                     break;
                 case 7:
                     switch (tokenName) {
-                        case "else": // CODE GEN: jmp save end of if block
+                        case "else":
+                            codeGen.if_jpfSave();
                             state = 8;
                             break;
                         default:
@@ -440,10 +447,10 @@ public class SyntaxAnalyzer {
                     }
                     break;
                 case 8:
-                case 12:
                     if (grammar.first(new Token(null, "statement", "NONTERMINAL")).contains(token)) {
                         lexicalAnalyzer.setRepeatToken();
                         if (statement()) {
+                            codeGen.if_jp();
                             state = 2;
                         } else
                             return false;
@@ -474,6 +481,7 @@ public class SyntaxAnalyzer {
                 case 11:
                     switch (tokenName) {
                         case ")":
+                            codeGen.while_save();
                             state = 12;
                             break;
                         default:
@@ -481,6 +489,18 @@ public class SyntaxAnalyzer {
                             lexicalAnalyzer.setRepeatToken();
                             state = 12;
                     }
+                    break;
+                case 12:
+                    if (grammar.first(new Token(null, "statement", "NONTERMINAL")).contains(token)) {
+                        lexicalAnalyzer.setRepeatToken();
+                        if (statement()) {
+                            switchOrWhile = -1;
+                            codeGen.whileEnd();
+                            state = 2;
+                        } else
+                            return false;
+                    } else
+                        System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     break;
                 case 13:
                     switch (tokenName) {
@@ -545,6 +565,8 @@ public class SyntaxAnalyzer {
                 case 19:
                     switch (tokenName) {
                         case "}":
+                            switchOrWhile = -1;
+                            codeGen.switchEnd();
                             state = 2;
                             break;
                         case "default":
@@ -584,6 +606,8 @@ public class SyntaxAnalyzer {
                 case 22:
                     switch (tokenName) {
                         case "}":
+                            switchOrWhile = -1;
+                            codeGen.switchEnd();
                             state = 2;
                             break;
                         default:
@@ -595,6 +619,8 @@ public class SyntaxAnalyzer {
                 case 23:
                     switch (tokenName) {
                         case "NUM":
+                            codeGen.switch_matchCase();
+                            codeGen.switch_jpfSave();
                             state = 24;
                             break;
                         default:

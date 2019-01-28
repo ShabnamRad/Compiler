@@ -218,7 +218,7 @@ public class LexicalAnalyzer {
     public void setRepeatToken() { repeatToken = true; }
 
     public static void main(String[] args) {
-        LexicalAnalyzer a = new LexicalAnalyzer(new File("C:\\Users\\parha\\Desktop\\main.c"));
+        LexicalAnalyzer a = new LexicalAnalyzer(new File("C:\\Users\\parha\\Desktop\\mainn.c"));
         for (int i = 0; i < 550; i++) {
             a.getToken();
         }
