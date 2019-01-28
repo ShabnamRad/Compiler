@@ -2,15 +2,23 @@ package Parser;
 
 import Scanner.LexicalAnalyzer;
 import Scanner.Token;
+import CodeGeneration.SemanticAnalyzer;
+import CodeGeneration.CodeGen;
 
 import java.util.HashSet;
+import java.util.Stack;
 
 public class SyntaxAnalyzer {
     private LexicalAnalyzer lexicalAnalyzer;
+    private SemanticAnalyzer semanticAnalyzer;
+    private CodeGen codeGen;
     private Grammar grammar = Grammar.getInstance();
 
     public SyntaxAnalyzer(LexicalAnalyzer lexicalAnalyzer) {
         this.lexicalAnalyzer = lexicalAnalyzer;
+        this.semanticAnalyzer = new SemanticAnalyzer();
+        this.codeGen = new CodeGen();
+
         if (program())
             System.out.println("input parsed successfully");
         else
@@ -68,7 +76,7 @@ public class SyntaxAnalyzer {
                 case 0:
                     switch (tokenName) {
                         case "int":
-                        case "void":
+                        case "void": // add type to semantic stack for checking the following id
                             state = 1;
                             break;
                         default:
@@ -81,7 +89,8 @@ public class SyntaxAnalyzer {
                     break;
                 case 1:
                     switch (tokenName) {
-                        case "ID":
+                        case "ID": // Check existance in symbol table, if not, set type based on stack. if yes, error.
+                                   // CODE GEN: check ID type if unknown proceed with assign, if not error
                             state = 2;
                             break;
                         default:
@@ -95,7 +104,7 @@ public class SyntaxAnalyzer {
                         case ";":
                             state = 0;
                             break;
-                        case "[":
+                        case "[": // prev and this, check that the type is not void
                             state = 3;
                             break;
                         case "(":
@@ -120,7 +129,7 @@ public class SyntaxAnalyzer {
                     break;
                 case 4:
                     switch (tokenName) {
-                        case "]":
+                        case "]": // CODE GEN: initiate array
                             state = 5;
                             break;
                         default:
@@ -152,7 +161,7 @@ public class SyntaxAnalyzer {
                     break;
                 case 8:
                     switch (tokenName) {
-                        case ")":
+                        case ")": // CODE GEN: put function address in the variable
                             state = 9;
                             break;
                         default:
@@ -238,7 +247,7 @@ public class SyntaxAnalyzer {
                     break;
                 case 1:
                     switch (tokenName) {
-                        case "ID":
+                        case "ID": // CODE GEN: initialize id without checking because parameters are whatever
                             state = 2;
                             break;
                         default:
@@ -265,7 +274,7 @@ public class SyntaxAnalyzer {
                     break;
                 case 3:
                     switch (tokenName) {
-                        case "]":
+                        case "]": // CODE GEN: initialize array parameter
                             state = 4;
                             break;
                         default:
@@ -332,14 +341,15 @@ public class SyntaxAnalyzer {
                         case ";":
                             state = 2;
                             break;
-                        case "continue":
-                        case "break":
+                        case "continue": // CODE GEN: jump address of start of while
+                        case "break": // CODE GEN: savejump to address of end of while/switch
                             state = 1;
                             break;
                         case "if":
                             state = 3;
                             break;
                         case "while":
+                            codeGen.label();
                             state = 9;
                             break;
                         case "return":
@@ -397,8 +407,9 @@ public class SyntaxAnalyzer {
                         System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     break;
                 case 5:
+                    // CODE GEN: evaluate expression and jmpsave if false
                     switch (tokenName) {
-                        case ")":
+                        case ")": // CODE GEN: if jump save operations here
                             state = 6;
                             break;
                         default:
@@ -419,7 +430,7 @@ public class SyntaxAnalyzer {
                     break;
                 case 7:
                     switch (tokenName) {
-                        case "else":
+                        case "else": // CODE GEN: jmp save end of if block
                             state = 8;
                             break;
                         default:
