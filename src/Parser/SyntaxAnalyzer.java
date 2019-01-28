@@ -6,6 +6,7 @@ import CodeGeneration.SemanticAnalyzer;
 import CodeGeneration.CodeGen;
 
 import java.util.HashSet;
+import java.util.Stack;
 
 public class SyntaxAnalyzer {
     private LexicalAnalyzer lexicalAnalyzer;
@@ -13,7 +14,7 @@ public class SyntaxAnalyzer {
     private CodeGen codeGen;
     private Grammar grammar = Grammar.getInstance();
 
-    private static int switchOrWhile = -1;
+    private static Stack<Integer> switchOrWhile = new Stack<>();
 
     public SyntaxAnalyzer(LexicalAnalyzer lexicalAnalyzer) {
         this.lexicalAnalyzer = lexicalAnalyzer;
@@ -344,14 +345,14 @@ public class SyntaxAnalyzer {
                             break;
                         case "continue": // CODE GEN: jump address of start of while
                         case "break": // CODE GEN: savejump to address of end of while/switch
-                            codeGen.jpTop(switchOrWhile);
+                            codeGen.jpTop(switchOrWhile.peek());
                             state = 1;
                             break;
                         case "if":
                             state = 3;
                             break;
                         case "while":
-                            switchOrWhile = 0;
+                            switchOrWhile.push(0);
                             codeGen.while_label();
                             state = 9;
                             break;
@@ -359,7 +360,7 @@ public class SyntaxAnalyzer {
                             state = 13;
                             break;
                         case "switch":
-                            switchOrWhile = 1;
+                            switchOrWhile.push(1);
                             codeGen.switchInit();
                             state = 15;
                             break;
@@ -494,7 +495,7 @@ public class SyntaxAnalyzer {
                     if (grammar.first(new Token(null, "statement", "NONTERMINAL")).contains(token)) {
                         lexicalAnalyzer.setRepeatToken();
                         if (statement()) {
-                            switchOrWhile = -1;
+                            switchOrWhile.pop();
                             codeGen.whileEnd();
                             state = 2;
                         } else
@@ -565,11 +566,12 @@ public class SyntaxAnalyzer {
                 case 19:
                     switch (tokenName) {
                         case "}":
-                            switchOrWhile = -1;
-                            codeGen.switchEnd();
+                            switchOrWhile.pop();
+                            codeGen.switchEnd(false);
                             state = 2;
                             break;
                         case "default":
+                            codeGen.switch_jpf();
                             state = 20;
                             break;
                         case "case":
@@ -606,8 +608,8 @@ public class SyntaxAnalyzer {
                 case 22:
                     switch (tokenName) {
                         case "}":
-                            switchOrWhile = -1;
-                            codeGen.switchEnd();
+                            switchOrWhile.pop();
+                            codeGen.switchEnd(true);
                             state = 2;
                             break;
                         default:
@@ -619,8 +621,8 @@ public class SyntaxAnalyzer {
                 case 23:
                     switch (tokenName) {
                         case "NUM":
-                            codeGen.switch_matchCase();
-                            codeGen.switch_jpfSave();
+                            codeGen.switch_matchCaseJpf(token);
+                            codeGen.switch_save();
                             state = 24;
                             break;
                         default:

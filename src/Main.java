@@ -17,7 +17,7 @@ public class Main {
 
         LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(new File(args[0]));
         new SyntaxAnalyzer(lexicalAnalyzer);
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 25; i++) {
             System.out.print(i + "\t");
             System.out.println(CodeGen.ProgramBlock[i]);
         }
