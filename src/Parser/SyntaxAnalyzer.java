@@ -35,7 +35,7 @@ public class SyntaxAnalyzer {
                         else
                             return false;
                     } else
-                        return false;
+                        System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     break;
                 case 1:
                     switch (tokenName) {
@@ -43,7 +43,9 @@ public class SyntaxAnalyzer {
                             state = 2;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing EOF token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 2;
                     }
                     break;
                 default:
@@ -74,7 +76,7 @@ public class SyntaxAnalyzer {
                                 state = 6;
                                 lexicalAnalyzer.setRepeatToken();
                             } else
-                                return false;
+                                System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     }
                     break;
                 case 1:
@@ -83,7 +85,9 @@ public class SyntaxAnalyzer {
                             state = 2;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing identifier. First possible id from symbol table was added to input."); //TODO
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 2;
                     }
                     break;
                 case 2:
@@ -98,7 +102,9 @@ public class SyntaxAnalyzer {
                             state = 7;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing ; token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 0;
                     }
                     break;
                 case 3:
@@ -107,7 +113,9 @@ public class SyntaxAnalyzer {
                             state = 4;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing number. 0 was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 4;
                     }
                     break;
                 case 4:
@@ -116,7 +124,9 @@ public class SyntaxAnalyzer {
                             state = 5;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing ] token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 5;
                     }
                     break;
                 case 5:
@@ -125,7 +135,9 @@ public class SyntaxAnalyzer {
                             state = 0;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing ; token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 0;
                     }
                     break;
                 case 7:
@@ -136,7 +148,7 @@ public class SyntaxAnalyzer {
                         } else
                             return false;
                     } else
-                        return false;
+                        System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     break;
                 case 8:
                     switch (tokenName) {
@@ -144,7 +156,9 @@ public class SyntaxAnalyzer {
                             state = 9;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing ) token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 9;
                     }
                     break;
                 case 9:
@@ -153,7 +167,9 @@ public class SyntaxAnalyzer {
                             state = 10;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing ( token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 10;
                     }
                     break;
                 case 10:
@@ -165,7 +181,7 @@ public class SyntaxAnalyzer {
                         } else
                             return false;
                     } else
-                        return false;
+                        System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     break;
                 case 11:
                     switch (tokenName) {
@@ -173,7 +189,9 @@ public class SyntaxAnalyzer {
                             state = 0;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing } token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 0;
                     }
                     break;
                 case 12:
@@ -185,7 +203,7 @@ public class SyntaxAnalyzer {
                         } else
                             return false;
                     } else
-                        return false;
+                        System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     break;
                 default:
                     return false;
@@ -213,7 +231,9 @@ public class SyntaxAnalyzer {
                             state = 6;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing type-specifier. int token was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 1;
                     }
                     break;
                 case 1:
@@ -222,7 +242,9 @@ public class SyntaxAnalyzer {
                             state = 2;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing identifier. First possible id from symbol table was added to input."); //TODO
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 2;
                     }
                     break;
                 case 2:
@@ -238,7 +260,7 @@ public class SyntaxAnalyzer {
                                 state = 7;
                                 lexicalAnalyzer.setRepeatToken();
                             } else
-                                return false;
+                                System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     }
                     break;
                 case 3:
@@ -247,7 +269,9 @@ public class SyntaxAnalyzer {
                             state = 4;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing ] token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 4;
                     }
                     break;
                 case 4:
@@ -260,7 +284,7 @@ public class SyntaxAnalyzer {
                                 state = 7;
                                 lexicalAnalyzer.setRepeatToken();
                             } else
-                                return false;
+                                System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     }
                     break;
                 case 5:
@@ -270,7 +294,9 @@ public class SyntaxAnalyzer {
                             state = 1;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing type-specifier. int token was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 1;
                     }
                     break;
                 case 6:
@@ -283,7 +309,7 @@ public class SyntaxAnalyzer {
                                 state = 7;
                                 lexicalAnalyzer.setRepeatToken();
                             } else
-                                return false;
+                                System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     }
                     break;
                 default:
@@ -333,7 +359,7 @@ public class SyntaxAnalyzer {
                                 } else
                                     return false;
                             } else
-                                return false;
+                                System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                             break;
                     }
                     break;
@@ -344,7 +370,9 @@ public class SyntaxAnalyzer {
                             state = 2;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing ; token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 2;
                     }
                     break;
                 case 3:
@@ -353,7 +381,9 @@ public class SyntaxAnalyzer {
                             state = 4;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing ( token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 4;
                     }
                     break;
                 case 4:
@@ -364,7 +394,7 @@ public class SyntaxAnalyzer {
                         } else
                             return false;
                     } else
-                        return false;
+                        System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     break;
                 case 5:
                     switch (tokenName) {
@@ -372,7 +402,9 @@ public class SyntaxAnalyzer {
                             state = 6;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing ) token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 6;
                     }
                     break;
                 case 6:
@@ -383,7 +415,7 @@ public class SyntaxAnalyzer {
                         } else
                             return false;
                     } else
-                        return false;
+                        System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     break;
                 case 7:
                     switch (tokenName) {
@@ -391,7 +423,9 @@ public class SyntaxAnalyzer {
                             state = 8;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing else token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 8;
                     }
                     break;
                 case 8:
@@ -403,7 +437,7 @@ public class SyntaxAnalyzer {
                         } else
                             return false;
                     } else
-                        return false;
+                        System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     break;
                 case 9:
                     switch (tokenName) {
@@ -411,7 +445,9 @@ public class SyntaxAnalyzer {
                             state = 10;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing ( token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 10;
                     }
                     break;
                 case 10:
@@ -422,7 +458,7 @@ public class SyntaxAnalyzer {
                         } else
                             return false;
                     } else
-                        return false;
+                        System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     break;
                 case 11:
                     switch (tokenName) {
@@ -430,7 +466,9 @@ public class SyntaxAnalyzer {
                             state = 12;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing ) token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 12;
                     }
                     break;
                 case 13:
@@ -446,7 +484,7 @@ public class SyntaxAnalyzer {
                                 } else
                                     return false;
                             } else
-                                return false;
+                                System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                             break;
                     }
                     break;
@@ -456,7 +494,9 @@ public class SyntaxAnalyzer {
                             state = 16;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing ( token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 16;
                     }
                     break;
                 case 16:
@@ -467,7 +507,7 @@ public class SyntaxAnalyzer {
                         } else
                             return false;
                     } else
-                        return false;
+                        System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     break;
                 case 17:
                     switch (tokenName) {
@@ -475,7 +515,9 @@ public class SyntaxAnalyzer {
                             state = 18;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing ) token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 18;
                     }
                     break;
                 case 18:
@@ -484,7 +526,9 @@ public class SyntaxAnalyzer {
                             state = 19;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing { token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 19;
                     }
                     break;
                 case 19:
@@ -499,7 +543,9 @@ public class SyntaxAnalyzer {
                             state = 23;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing case token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 23;
                     }
                     break;
                 case 20:
@@ -508,7 +554,9 @@ public class SyntaxAnalyzer {
                             state = 21;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing : token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 21;
                     }
                     break;
                 case 21:
@@ -520,7 +568,7 @@ public class SyntaxAnalyzer {
                         } else
                             return false;
                     } else
-                        return false;
+                        System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     break;
                 case 22:
                     switch (tokenName) {
@@ -528,7 +576,9 @@ public class SyntaxAnalyzer {
                             state = 2;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing } token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 2;
                     }
                     break;
                 case 23:
@@ -537,7 +587,9 @@ public class SyntaxAnalyzer {
                             state = 24;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing number. 0 was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 24;
                     }
                     break;
                 case 24:
@@ -546,11 +598,13 @@ public class SyntaxAnalyzer {
                             state = 25;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing : token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 25;
                     }
                     break;
                 case 25:
-                    Token withEpsilon3 = new Token(null, "declaration-list", "NONTERMINAL");
+                    Token withEpsilon3 = new Token(null, "statement-list", "NONTERMINAL");
                     if (grammar.first(withEpsilon3).contains(token) || grammar.follow(withEpsilon3).contains(token)) {
                         lexicalAnalyzer.setRepeatToken();
                         if (statement_list()) {
@@ -558,7 +612,7 @@ public class SyntaxAnalyzer {
                         } else
                             return false;
                     } else
-                        return false;
+                        System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     break;
                 case 26:
                     Token withEpsilon = new Token(null, "declaration-list", "NONTERMINAL");
@@ -569,7 +623,7 @@ public class SyntaxAnalyzer {
                         else
                             return false;
                     } else
-                        return false;
+                        System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     break;
                 case 27:
                     Token withEpsilon4 = new Token(null, "statement-list", "NONTERMINAL");
@@ -580,7 +634,7 @@ public class SyntaxAnalyzer {
                         } else
                             return false;
                     } else
-                        return false;
+                        System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     break;
                 case 28:
                     switch (tokenName) {
@@ -588,7 +642,9 @@ public class SyntaxAnalyzer {
                             state = 2;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing } token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 2;
                     }
                     break;
                 default:
@@ -620,7 +676,9 @@ public class SyntaxAnalyzer {
                             state = 4;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing ( token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 1;
                     }
                     break;
                 case 1:
@@ -631,7 +689,7 @@ public class SyntaxAnalyzer {
                         else
                             return false;
                     } else
-                        return false;
+                        System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     break;
                 case 2:
                     switch (tokenName) {
@@ -639,7 +697,9 @@ public class SyntaxAnalyzer {
                             state = 9;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing ) token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 9;
                     }
                     break;
                 case 3:
@@ -655,7 +715,7 @@ public class SyntaxAnalyzer {
                                 else
                                     return false;
                             } else
-                                return false;
+                                System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     }
                     break;
                 case 4:
@@ -685,7 +745,7 @@ public class SyntaxAnalyzer {
                                 state = 15;
                                 lexicalAnalyzer.setRepeatToken();
                             } else
-                                return false;
+                                System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     }
                     break;
                 case 5:
@@ -696,7 +756,7 @@ public class SyntaxAnalyzer {
                         else
                             return false;
                     } else
-                        return false;
+                        System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     break;
                 case 6:
                     switch (tokenName) {
@@ -704,7 +764,9 @@ public class SyntaxAnalyzer {
                             state = 7;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing ] token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 7;
                     }
                     break;
                 case 7:
@@ -728,7 +790,7 @@ public class SyntaxAnalyzer {
                                 state = 15;
                                 lexicalAnalyzer.setRepeatToken();
                             } else
-                                return false;
+                                System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     }
                     break;
                 case 8:
@@ -740,7 +802,9 @@ public class SyntaxAnalyzer {
                             state = 11;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing , token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 11;
                     }
                     break;
                 case 9:
@@ -761,7 +825,7 @@ public class SyntaxAnalyzer {
                                 state = 15;
                                 lexicalAnalyzer.setRepeatToken();
                             } else
-                                return false;
+                                System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     }
                     break;
                 case 10:
@@ -772,7 +836,7 @@ public class SyntaxAnalyzer {
                         else
                             return false;
                     } else
-                        return false;
+                        System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     break;
                 case 11:
                     if (grammar.first(new Token(null, "expression", "NONTERMINAL")).contains(token)) {
@@ -782,7 +846,7 @@ public class SyntaxAnalyzer {
                         else
                             return false;
                     } else
-                        return false;
+                        System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     break;
                 case 12:
                     switch (tokenName) {
@@ -795,7 +859,7 @@ public class SyntaxAnalyzer {
                                 state = 15;
                                 lexicalAnalyzer.setRepeatToken();
                             } else
-                                return false;
+                                System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     }
                     break;
                 case 13:
@@ -806,7 +870,7 @@ public class SyntaxAnalyzer {
                         else
                             return false;
                     } else
-                        return false;
+                        System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     break;
                 case 14:
                     switch (tokenName) {
@@ -819,7 +883,7 @@ public class SyntaxAnalyzer {
                                 state = 15;
                                 lexicalAnalyzer.setRepeatToken();
                             } else
-                                return false;
+                                System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     }
                     break;
                 case 16:
@@ -830,7 +894,7 @@ public class SyntaxAnalyzer {
                         else
                             return false;
                     } else
-                        return false;
+                        System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     break;
                 case 17:
                     if (grammar.first(new Token(null, "term", "NONTERMINAL")).contains(token)) {
@@ -840,7 +904,7 @@ public class SyntaxAnalyzer {
                         else
                             return false;
                     } else
-                        return false;
+                        System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     break;
                 default:
                     return false;
@@ -868,7 +932,7 @@ public class SyntaxAnalyzer {
                         else
                             return false;
                     } else
-                        return false;
+                        System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     break;
                 case 1:
                     switch (tokenName) {
@@ -880,7 +944,7 @@ public class SyntaxAnalyzer {
                                 state = 2;
                                 lexicalAnalyzer.setRepeatToken();
                             } else
-                                return false;
+                                System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     }
                     break;
                 default:
@@ -912,7 +976,9 @@ public class SyntaxAnalyzer {
                             state = 4;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing ( token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 1;
                     }
                     break;
                 case 1:
@@ -923,7 +989,7 @@ public class SyntaxAnalyzer {
                         else
                             return false;
                     } else
-                        return false;
+                        System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     break;
                 case 2:
                     switch (tokenName) {
@@ -931,7 +997,9 @@ public class SyntaxAnalyzer {
                             state = 3;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing ) token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 3;
                     }
                     break;
                 case 4:
@@ -947,7 +1015,7 @@ public class SyntaxAnalyzer {
                                 state = 3;
                                 lexicalAnalyzer.setRepeatToken();
                             } else
-                                return false;
+                                System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     }
                     break;
                 case 5:
@@ -958,7 +1026,7 @@ public class SyntaxAnalyzer {
                         else
                             return false;
                     } else
-                        return false;
+                        System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     break;
                 case 6:
                     switch (tokenName) {
@@ -966,7 +1034,9 @@ public class SyntaxAnalyzer {
                             state = 3;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing ] token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 3;
                     }
                     break;
                 case 7:
@@ -982,7 +1052,7 @@ public class SyntaxAnalyzer {
                                 else
                                     return false;
                             } else
-                                return false;
+                                System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     }
                     break;
                 case 8:
@@ -994,7 +1064,9 @@ public class SyntaxAnalyzer {
                             state = 3;
                             break;
                         default:
-                            return false;
+                            System.out.println("missing , token. It was added to input.");
+                            lexicalAnalyzer.setRepeatToken();
+                            state = 9;
                     }
                     break;
                 case 9:
@@ -1005,7 +1077,7 @@ public class SyntaxAnalyzer {
                         else
                             return false;
                     } else
-                        return false;
+                        System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     break;
                 default:
                     return false;
@@ -1033,7 +1105,7 @@ public class SyntaxAnalyzer {
                         state = 2;
                         lexicalAnalyzer.setRepeatToken();
                     } else
-                        return false;
+                        System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     break;
                 case 1:
                     if (grammar.first(new Token(null, "statement", "NONTERMINAL")).contains(token)) {
@@ -1046,7 +1118,7 @@ public class SyntaxAnalyzer {
                         state = 2;
                         lexicalAnalyzer.setRepeatToken();
                     } else
-                        return false;
+                        System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     break;
                 default:
                     return false;
