@@ -2,27 +2,33 @@ package Parser;
 
 import Scanner.LexicalAnalyzer;
 import Scanner.Token;
-import CodeGeneration.SemanticAnalyzer;
 import CodeGeneration.CodeGen;
+import SymbolTable.SymbolTable;
 
 import java.util.HashSet;
 import java.util.Stack;
 
 public class SyntaxAnalyzer {
     private LexicalAnalyzer lexicalAnalyzer;
-    private SemanticAnalyzer semanticAnalyzer;
     private CodeGen codeGen;
     private Grammar grammar = Grammar.getInstance();
 
     private static Stack<Integer> switchOrWhile = new Stack<>();
 
+    //Semantics
+    private static Stack<String> SemanticStack = new Stack<>();
+    private static boolean main_exists = false;
+
     public SyntaxAnalyzer(LexicalAnalyzer lexicalAnalyzer) {
         this.lexicalAnalyzer = lexicalAnalyzer;
-        this.semanticAnalyzer = new SemanticAnalyzer();
         this.codeGen = new CodeGen();
 
-        if (program())
-            System.out.println("input parsed successfully");
+        if (program() && main_exists) {
+            System.out.print((char) 27 + "[36m");
+            System.out.println("\ninput parsed successfully\n");
+        }
+        else if (!main_exists)
+            throw new Error("There's no main function in code");
         else
             System.out.println("parsing encountered an error");
     }
@@ -64,6 +70,9 @@ public class SyntaxAnalyzer {
         }
     }
 
+    //Semantics
+    private static boolean type_void = false;
+
     @SuppressWarnings("all")
     private boolean declaration_list() {
         Token diagramNonTerminal = new Token(null, "declaration-list", "NONTERMINAL");
@@ -78,7 +87,10 @@ public class SyntaxAnalyzer {
                 case 0:
                     switch (tokenName) {
                         case "int":
-                        case "void": // add type to semantic stack for checking the following id
+                            state = 1;
+                            break;
+                        case "void":
+                            type_void = true;
                             state = 1;
                             break;
                         default:
@@ -91,8 +103,18 @@ public class SyntaxAnalyzer {
                     break;
                 case 1:
                     switch (tokenName) {
-                        case "ID": // Check existance in symbol table, if not, set type based on stack. if yes, error.
-                                   // CODE GEN: check ID type if unknown proceed with assign, if not error
+                        case "ID":
+                            //Semantics
+                            if (!token.getType().equals("unknown")) {
+                                throw new Error("ID already used");
+                            }
+                            if (type_void && token.getLexeme().equals("main") && SymbolTable.scope == 0) {
+                                main_exists = true;
+                            }
+                            // Updating ID type
+                            if (type_void) token.setType("void");
+                            else token.setType("int");
+
                             state = 2;
                             break;
                         default:
@@ -104,12 +126,19 @@ public class SyntaxAnalyzer {
                 case 2:
                     switch (tokenName) {
                         case ";":
+                            if (type_void) {
+                                throw new Error("Variables can't be of type void");
+                            }
                             state = 0;
                             break;
-                        case "[": // prev and this, check that the type is not void
+                        case "[":
+                            if (type_void) {
+                                throw new Error("Variables can't be of type void");
+                            }
                             state = 3;
                             break;
                         case "(":
+                            type_void = false;
                             state = 7;
                             break;
                         default:
@@ -176,6 +205,9 @@ public class SyntaxAnalyzer {
                 case 9:
                     switch (tokenName) {
                         case "{":
+                            //Semantics
+                            SymbolTable.scope += 1;
+
                             state = 10;
                             break;
                         default:
@@ -198,6 +230,9 @@ public class SyntaxAnalyzer {
                 case 11:
                     switch (tokenName) {
                         case "}":
+                            //Semantics
+                            SymbolTable.scope -= 1;
+
                             state = 0;
                             break;
                         default:
@@ -250,7 +285,7 @@ public class SyntaxAnalyzer {
                     break;
                 case 1:
                     switch (tokenName) {
-                        case "ID": // CODE GEN: initialize id without checking because parameters are whatever
+                        case "ID":
                             state = 2;
                             break;
                         default:
@@ -366,6 +401,9 @@ public class SyntaxAnalyzer {
                             state = 15;
                             break;
                         case "{":
+                            //Semantics
+                            SymbolTable.scope += 1;
+
                             state = 26;
                             break;
                         default:
@@ -556,6 +594,9 @@ public class SyntaxAnalyzer {
                 case 18:
                     switch (tokenName) {
                         case "{":
+                            //Semantics
+                            SymbolTable.scope += 1;
+
                             state = 19;
                             break;
                         default:
@@ -567,7 +608,10 @@ public class SyntaxAnalyzer {
                 case 19:
                     switch (tokenName) {
                         case "}":
+                            //Semantics
+                            SymbolTable.scope -= 1;
                             switchOrWhile.pop();
+
                             codeGen.switchEnd(false);
                             state = 2;
                             break;
@@ -609,7 +653,10 @@ public class SyntaxAnalyzer {
                 case 22:
                     switch (tokenName) {
                         case "}":
+                            //Semantics
+                            SymbolTable.scope -= 1;
                             switchOrWhile.pop();
+
                             codeGen.switchEnd(true);
                             state = 2;
                             break;
@@ -680,6 +727,9 @@ public class SyntaxAnalyzer {
                 case 28:
                     switch (tokenName) {
                         case "}":
+                            //Semantics
+                            SymbolTable.scope -= 1;
+
                             state = 2;
                             break;
                         default:
@@ -715,7 +765,25 @@ public class SyntaxAnalyzer {
                             state = 9;
                             break;
                         case "ID":
-                            codeGen.pID(token.getLexeme());
+                            //Semantics
+                            if (token.getType().equals("unknown")) {
+                                int s = SymbolTable.scope;
+                                Token t;
+                                while (s >= 0) {
+                                    try {
+                                        t = SymbolTable.get(token.getLexeme(), s);
+                                        codeGen.pID(t);
+                                        break;
+                                    } catch (Error e){
+                                        s --;
+                                    }
+                                }
+                                if (s < 0) {
+                                    SymbolTable.show();
+                                    throw new Error("ID not defined");
+                                }
+                            }
+
                             state = 4;
                             break;
                         default:
@@ -1049,7 +1117,26 @@ public class SyntaxAnalyzer {
                             state = 3;
                             break;
                         case "ID":
-                            codeGen.pID(token.getLexeme());
+                            //Semantics
+                            if (token.getType().equals("unknown")) {
+                                int s = SymbolTable.scope;
+                                Token t;
+                                while (s >= 0) {
+                                    try {
+                                        t = SymbolTable.get(token.getLexeme(), s);
+                                        codeGen.pID(t);
+                                        break;
+                                    } catch (Error e){
+                                        s --;
+                                        System.out.println("oof");
+                                    }
+                                }
+                                if (s < 0) {
+                                    SymbolTable.show();
+                                    throw new Error("ID not defined");
+                                }
+                            }
+
                             state = 4;
                             break;
                         default:
