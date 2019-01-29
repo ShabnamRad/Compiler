@@ -171,7 +171,7 @@ public class Token {
     public boolean equals(Object obj) {
         try{
             Token token = (Token) obj;
-            return token.tokenName.equals(this.tokenName) && token.type.equals(this.type);
+            return token.tokenName.equals(this.tokenName);// && token.type.equals(this.type);
         } catch (Exception e) {
             return false;
         }

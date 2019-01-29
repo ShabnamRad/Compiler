@@ -42,12 +42,12 @@ public class CodeGen {
     private static void push_while(int i) {
         top_while ++;
         ss_while[top_while] = i;
-        System.out.println("pushed " + i + " in ss_while");
+//        System.out.println("pushed " + i + " in ss_while");
     }
     
     private static int pop_while() {
         top_while --;
-        System.out.println("popped from ss_while");
+//        System.out.println("popped from ss_while");
         return ss_while[top_while + 1];
     }
     
@@ -60,24 +60,24 @@ public class CodeGen {
     private static void push_if(int i) {
         top_if ++;
         ss_if[top_if] = i;
-        System.out.println("pushed " + i + " in ss_if");
+//        System.out.println("pushed " + i + " in ss_if");
     }
 
     private static int pop_if() {
         top_if --;
-        System.out.println("popped from ss_if");
+//        System.out.println("popped from ss_if");
         return ss_if[top_if + 1];
     }
 
     private static void push_switch(int i) {
         top_switch ++;
         ss_switch[top_switch] = i;
-        System.out.println("pushed " + i + " in ss_switch");
+//        System.out.println("pushed " + i + " in ss_switch");
     }
 
     private static int pop_switch() {
         top_switch --;
-        System.out.println("popped from ss_switch");
+//        System.out.println("popped from ss_switch");
         return ss_switch[top_switch + 1];
     }
 
@@ -90,12 +90,12 @@ public class CodeGen {
     private static void push_expr(String s) {
         top_expr ++;
         ss_expr[top_expr] = s;
-        System.out.println("pushed " + s + " in ss_expr");
+//        System.out.println("pushed " + s + " in ss_expr");
     }
 
     private static String pop_expr() {
         top_expr --;
-        System.out.println("popped from ss_expr");
+//        System.out.println("popped from ss_expr");
         return ss_expr[top_expr + 1];
     }
 
@@ -108,12 +108,12 @@ public class CodeGen {
     private static void push_opr(String s) {
         top_opr ++;
         ss_opr[top_opr] = s;
-        System.out.println("pushed " + s + " in ss_opr");
+//        System.out.println("pushed " + s + " in ss_opr");
     }
 
     private static String pop_opr() {
         top_opr --;
-        System.out.println("popped from ss_opr");
+//        System.out.println("popped from ss_opr");
         return ss_opr[top_opr + 1];
     }
 
@@ -135,6 +135,12 @@ public class CodeGen {
     public void while_save() {
         System.out.println("#while_save");
         push_while(index);
+        index ++;
+    }
+
+    public void while_continue() {
+        System.out.println("#while_continue");
+        ProgramBlock[index] = "(JP, " + ss_while[top_while] + ", , )";
         index ++;
     }
 
@@ -274,12 +280,12 @@ public class CodeGen {
     }
 
     public void pNum(String lexeme) {
-        System.out.println("pNum");
+        System.out.println("#pNum");
         push_expr("#" + lexeme);
     }
 
-    public void pID(String lexeme) {
-        Token t = SymbolTable.get(lexeme);
+    public void pID(Token t) {
+//        Token t = SymbolTable.get(lexeme);
         String addrID = t.getAddr();
         push_expr(addrID);
     }
@@ -305,7 +311,6 @@ public class CodeGen {
     public void declareID(Token t) {
         String newAddr = Integer.toString(getAddr());
         t.setAddr(newAddr);
-        SymbolTable.add(t);
         push_expr(newAddr);
     }
 

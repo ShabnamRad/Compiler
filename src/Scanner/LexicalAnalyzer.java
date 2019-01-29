@@ -190,6 +190,7 @@ public class LexicalAnalyzer {
         prevc = c;
         } while (!found);
 
+        System.out.print((char)27 + "[36mToken: ");
         System.out.print((char)27 + "[34m");
         System.out.println(raw.toString());
         System.out.print((char)27 + "[37m");
