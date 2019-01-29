@@ -265,8 +265,8 @@ public class CodeGen {
 
     public void pID(String lexeme) {
         Token t = SymbolTable.get(lexeme);
-        int addr = t.getAddr();
-        push_expr(Integer.toString(addr));
+        String addr = t.getAddr();
+        push_expr(addr);
     }
 
     public void pIndex() {
