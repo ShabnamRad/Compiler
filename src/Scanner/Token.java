@@ -5,15 +5,25 @@ package Scanner;
  */
 public class Token {
 
-    private String lexeme, tokenName, type;
+    private String lexeme, tokenName, type, addr;
+    private int scope;
 
     public Token(String inp) {
+        this.scope = -1;
         if (!checkSymbols(inp) && !checkReservedWord(inp)) {
             throw new Error("Token is identifier");
         }
     }
 
     public Token(String inp, String name, String type) {
+        this.scope = -1;
+        this.lexeme = inp;
+        this.tokenName = name;
+        this.type = type;
+    }
+
+    Token(String inp, String name, String type, int scope) {
+        this.scope = scope;
         this.lexeme = inp;
         this.tokenName = name;
         this.type = type;
@@ -22,6 +32,11 @@ public class Token {
     public String getLexeme() { return lexeme; }
     public String getTokenName() { return tokenName; }
     public String getType() { return type; }
+    public void setType(String t) { this.type = t; }
+    public void setScope(int s) { this.scope = s; }
+    public int getScope() { return this.scope; }
+    public void setAddr(String addr) { this.addr = addr; }
+    public String getAddr() { return this.addr; }
 
     public boolean match(String inp) {
         return this.lexeme.equals(inp);

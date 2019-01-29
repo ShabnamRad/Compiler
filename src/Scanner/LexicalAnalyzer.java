@@ -190,7 +190,9 @@ public class LexicalAnalyzer {
         prevc = c;
         } while (!found);
 
+        System.out.print((char)27 + "[34m");
         System.out.println(raw.toString());
+        System.out.print((char)27 + "[37m");
 
         prev = current;
         return Tokenize(raw.toString(), current);
@@ -203,11 +205,11 @@ public class LexicalAnalyzer {
         } catch (Error e1) {
             try {
                 lastToken = SymbolTable.get(inp);
-                return SymbolTable.get(inp);
+                return lastToken;
             } catch (Error e2) {
                 String name = c == 1? "NUM":"ID";
                 String type = c == 1? "INT":"unknown";
-                Token t = new Token(inp, name, type);
+                Token t = new Token(inp, name, type, Integer.parseInt(e2.getMessage()));
                 SymbolTable.add(t);
                 lastToken = t;
                 return t;
