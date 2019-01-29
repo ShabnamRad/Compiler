@@ -5,8 +5,8 @@ import SymbolTable.SymbolTable;
 
 public class CodeGen {
 
-    private static int index = 0, temp = 1000, addr = 1500;
-    public static String[] ProgramBlock = new String[2000];
+    private static int index = 0, temp = 1000, addr = 1500, arrays = 2000;
+    public static String[] ProgramBlock = new String[3000];
 
     private static int[] ss_while = new int[100];
     private static int top_while = -1;
@@ -32,6 +32,11 @@ public class CodeGen {
     private static int getAddr() {
         addr += 4;
         return addr - 4;
+    }
+
+    private static int getArrayAddr(int num) {
+        arrays += 4*num;
+        return arrays - 4*num;
     }
 
     private static void push_while(int i) {
@@ -180,7 +185,7 @@ public class CodeGen {
         int D = getTemp();
         String X = ss_expr[top_expr - 1];
         String caseNum = pop_expr();
-        ProgramBlock[index] = "(EQ, X, " + caseNum + ", " + D + ")";
+        ProgramBlock[index] = "(EQ, " + X + ", " + caseNum + ", " + D + ")";
         ProgramBlock[ss_switch[top_switch]] = "(JPF, " + ss_switch[top_switch - 1] + ", " + index + ", )";
         pop_switch(2);
         index ++;
@@ -229,7 +234,9 @@ public class CodeGen {
         String opr = pop_opr();
         String a = pop_expr();
         String b = pop_expr();
-        int D = getTemp();
+        int D = 0;
+        if(!opr.equals("="))
+            D = getTemp();
         String code = "";
         switch(opr) {
             case "+":
@@ -247,10 +254,18 @@ public class CodeGen {
             case "==":
                 code = "(EQ, " + a + ", " + b + ", " + D + ")";
                 break;
+            case "=":
+                code = "(ASSIGN, " + a + ", " + b + ", )";
         }
         ProgramBlock[index] = code;
         index ++;
-        push_expr(Integer.toString(D));
+        if(!opr.equals("="))
+            push_expr(Integer.toString(D));
+    }
+
+    public void assign() {
+        while(top_opr != -1 && ss_opr[top_opr].equals("="))
+            do_opr();
     }
 
     public void pOpr(String s) {
@@ -265,8 +280,8 @@ public class CodeGen {
 
     public void pID(String lexeme) {
         Token t = SymbolTable.get(lexeme);
-        String addr = t.getAddr();
-        push_expr(addr);
+        String addrID = t.getAddr();
+        push_expr(addrID);
     }
 
     public void pIndex() {
@@ -285,5 +300,23 @@ public class CodeGen {
             do_opr();
             do_opr();
         }
+    }
+
+    public void declareID(Token t) {
+        String newAddr = Integer.toString(getAddr());
+        t.setAddr(newAddr);
+        SymbolTable.add(t);
+        push_expr(newAddr);
+    }
+
+    public void initiateArray() {
+        String numString = pop_expr();
+        int num = Integer.parseInt(numString.substring(1));
+        int addrID = Integer.parseInt(pop_expr());
+        ProgramBlock[addrID] = Integer.toString(getArrayAddr(num));
+    }
+
+    public void popAddrID() {
+        pop_expr();
     }
 }

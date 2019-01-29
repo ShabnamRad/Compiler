@@ -91,8 +91,10 @@ public class SyntaxAnalyzer {
                     break;
                 case 1:
                     switch (tokenName) {
-                        case "ID": // Check existance in symbol table, if not, set type based on stack. if yes, error.
-                                   // CODE GEN: check ID type if unknown proceed with assign, if not error
+                        case "ID":
+                            codeGen.declareID(token);
+                            // Check existance in symbol table, if not, set type based on stack. if yes, error.
+                            // CODE GEN: check ID type if unknown proceed with assign, if not error
                             state = 2;
                             break;
                         default:
@@ -104,6 +106,7 @@ public class SyntaxAnalyzer {
                 case 2:
                     switch (tokenName) {
                         case ";":
+                            codeGen.popAddrID();
                             state = 0;
                             break;
                         case "[": // prev and this, check that the type is not void
@@ -132,7 +135,8 @@ public class SyntaxAnalyzer {
                     break;
                 case 4:
                     switch (tokenName) {
-                        case "]": // CODE GEN: initiate array
+                        case "]":
+                            codeGen.initiateArray();
                             state = 5;
                             break;
                         default:
@@ -372,6 +376,7 @@ public class SyntaxAnalyzer {
                             if (grammar.first(new Token(null, "expression", "NONTERMINAL")).contains(token)) {
                                 lexicalAnalyzer.setRepeatToken();
                                 if (expression()) {
+                                    codeGen.assign();
                                     state = 1;
                                 } else
                                     return false;
@@ -407,6 +412,7 @@ public class SyntaxAnalyzer {
                     if (grammar.first(new Token(null, "expression", "NONTERMINAL")).contains(token)) {
                         lexicalAnalyzer.setRepeatToken();
                         if (expression()) {
+                            codeGen.assign();
                             state = 5;
                         } else
                             return false;
@@ -474,6 +480,7 @@ public class SyntaxAnalyzer {
                     if (grammar.first(new Token(null, "expression", "NONTERMINAL")).contains(token)) {
                         lexicalAnalyzer.setRepeatToken();
                         if (expression()) {
+                            codeGen.assign();
                             state = 11;
                         } else
                             return false;
@@ -513,6 +520,7 @@ public class SyntaxAnalyzer {
                             if (grammar.first(new Token(null, "expression", "NONTERMINAL")).contains(token)) {
                                 lexicalAnalyzer.setRepeatToken();
                                 if (expression()) {
+                                    codeGen.assign();
                                     state = 14;
                                 } else
                                     return false;
@@ -536,6 +544,7 @@ public class SyntaxAnalyzer {
                     if (grammar.first(new Token(null, "expression", "NONTERMINAL")).contains(token)) {
                         lexicalAnalyzer.setRepeatToken();
                         if (expression()) {
+                            codeGen.assign();
                             state = 17;
                         } else
                             return false;
@@ -727,9 +736,10 @@ public class SyntaxAnalyzer {
                 case 1:
                     if (grammar.first(new Token(null, "expression", "NONTERMINAL")).contains(token)) {
                         lexicalAnalyzer.setRepeatToken();
-                        if (expression())
+                        if (expression()) {
+                            codeGen.assign();
                             state = 2;
-                        else
+                        } else
                             return false;
                     } else
                         System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
@@ -753,9 +763,10 @@ public class SyntaxAnalyzer {
                         default:
                             if (grammar.first(new Token(null, "expression", "NONTERMINAL")).contains(token)) {
                                 lexicalAnalyzer.setRepeatToken();
-                                if (expression())
+                                if (expression()) {
+                                    codeGen.assign();
                                     state = 8;
-                                else
+                                } else
                                     return false;
                             } else
                                 System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
@@ -764,6 +775,7 @@ public class SyntaxAnalyzer {
                 case 4:
                     switch (tokenName) {
                         case "=":
+                            codeGen.pOpr(tokenName);
                             state = 0;
                             break;
                         case "(":
@@ -797,9 +809,10 @@ public class SyntaxAnalyzer {
                 case 5:
                     if (grammar.first(new Token(null, "expression", "NONTERMINAL")).contains(token)) {
                         lexicalAnalyzer.setRepeatToken();
-                        if (expression())
+                        if (expression()) {
+                            codeGen.assign();
                             state = 6;
-                        else
+                        } else
                             return false;
                     } else
                         System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
@@ -819,6 +832,7 @@ public class SyntaxAnalyzer {
                 case 7:
                     switch (tokenName) {
                         case "=":
+                            codeGen.pOpr(tokenName);
                             state = 0;
                             break;
                         case "*":
@@ -895,9 +909,10 @@ public class SyntaxAnalyzer {
                 case 11:
                     if (grammar.first(new Token(null, "expression", "NONTERMINAL")).contains(token)) {
                         lexicalAnalyzer.setRepeatToken();
-                        if (expression())
+                        if (expression()) {
+                            codeGen.assign();
                             state = 8;
-                        else
+                        } else
                             return false;
                     } else
                         System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
@@ -1061,9 +1076,10 @@ public class SyntaxAnalyzer {
                 case 1:
                     if (grammar.first(new Token(null, "expression", "NONTERMINAL")).contains(token)) {
                         lexicalAnalyzer.setRepeatToken();
-                        if (expression())
+                        if (expression()) {
+                            codeGen.assign();
                             state = 2;
-                        else
+                        } else
                             return false;
                     } else
                         System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
@@ -1098,9 +1114,10 @@ public class SyntaxAnalyzer {
                 case 5:
                     if (grammar.first(new Token(null, "expression", "NONTERMINAL")).contains(token)) {
                         lexicalAnalyzer.setRepeatToken();
-                        if (expression())
+                        if (expression()) {
+                            codeGen.assign();
                             state = 6;
-                        else
+                        } else
                             return false;
                     } else
                         System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
@@ -1125,9 +1142,10 @@ public class SyntaxAnalyzer {
                         default:
                             if (grammar.first(new Token(null, "expression", "NONTERMINAL")).contains(token)) {
                                 lexicalAnalyzer.setRepeatToken();
-                                if (expression())
+                                if (expression()) {
+                                    codeGen.assign();
                                     state = 8;
-                                else
+                                } else
                                     return false;
                             } else
                                 System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
@@ -1150,9 +1168,10 @@ public class SyntaxAnalyzer {
                 case 9:
                     if (grammar.first(new Token(null, "expression", "NONTERMINAL")).contains(token)) {
                         lexicalAnalyzer.setRepeatToken();
-                        if (expression())
+                        if (expression()) {
+                            codeGen.assign();
                             state = 8;
-                        else
+                        } else
                             return false;
                     } else
                         System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");

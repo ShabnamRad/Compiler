@@ -18,9 +18,12 @@ public class Main {
         LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(new File(args[0]));
         new SyntaxAnalyzer(lexicalAnalyzer);
         System.out.print((char)27 + "[30m");
-        for (int i = 0; i < 25; i++) {
+        int i = 0;
+        String[] PB = CodeGen.ProgramBlock;
+        while(i < PB.length && PB[i] != null) {
             System.out.print(i + "\t");
             System.out.println(CodeGen.ProgramBlock[i]);
+            i++;
         }
 
         System.out.print((char)27 + "[35m");
