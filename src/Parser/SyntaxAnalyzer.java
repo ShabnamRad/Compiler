@@ -121,6 +121,7 @@ public class SyntaxAnalyzer {
                 case 3:
                     switch (tokenName) {
                         case "NUM":
+                            codeGen.pNum(token.getLexeme());
                             state = 4;
                             break;
                         default:
@@ -621,7 +622,8 @@ public class SyntaxAnalyzer {
                 case 23:
                     switch (tokenName) {
                         case "NUM":
-                            codeGen.switch_matchCaseJpf(token);
+                            codeGen.pNum(token.getLexeme());
+                            codeGen.switch_matchCaseJpf();
                             codeGen.switch_save();
                             state = 24;
                             break;
@@ -709,9 +711,11 @@ public class SyntaxAnalyzer {
                             state = 1;
                             break;
                         case "NUM":
+                            codeGen.pNum(token.getLexeme());
                             state = 9;
                             break;
                         case "ID":
+                            codeGen.pID(token.getLexeme());
                             state = 4;
                             break;
                         default:
@@ -769,14 +773,17 @@ public class SyntaxAnalyzer {
                             state = 5;
                             break;
                         case "*":
+                            codeGen.pOpr(tokenName);
                             state = 10;
                             break;
                         case "+":
                         case "-":
+                            codeGen.pOpr(tokenName);
                             state = 16;
                             break;
                         case "<":
                         case "==":
+                            codeGen.pOpr(tokenName);
                             state = 13;
                             break;
                         default:
@@ -800,6 +807,7 @@ public class SyntaxAnalyzer {
                 case 6:
                     switch (tokenName) {
                         case "]":
+                            codeGen.pIndex();
                             state = 7;
                             break;
                         default:
@@ -814,14 +822,17 @@ public class SyntaxAnalyzer {
                             state = 0;
                             break;
                         case "*":
+                            codeGen.pOpr(tokenName);
                             state = 10;
                             break;
                         case "+":
                         case "-":
+                            codeGen.pOpr(tokenName);
                             state = 16;
                             break;
                         case "<":
                         case "==":
+                            codeGen.pOpr(tokenName);
                             state = 13;
                             break;
                         default:
@@ -849,14 +860,17 @@ public class SyntaxAnalyzer {
                 case 9:
                     switch (tokenName) {
                         case "*":
+                            codeGen.pOpr(tokenName);
                             state = 10;
                             break;
                         case "+":
                         case "-":
+                            codeGen.pOpr(tokenName);
                             state = 16;
                             break;
                         case "<":
                         case "==":
+                            codeGen.pOpr(tokenName);
                             state = 13;
                             break;
                         default:
@@ -870,9 +884,10 @@ public class SyntaxAnalyzer {
                 case 10:
                     if (grammar.first(new Token(null, "factor", "NONTERMINAL")).contains(token)) {
                         lexicalAnalyzer.setRepeatToken();
-                        if (factor())
+                        if (factor()) {
+                            codeGen.do_opr();
                             state = 9;
-                        else
+                        } else
                             return false;
                     } else
                         System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
@@ -891,7 +906,13 @@ public class SyntaxAnalyzer {
                     switch (tokenName) {
                         case "<":
                         case "==":
+                            codeGen.pOpr(tokenName);
                             state = 13;
+                            break;
+                        case "+":
+                        case "-":
+                            codeGen.pOpr(tokenName);
+                            state = 16;
                             break;
                         default:
                             if (follow.contains(token)) {
@@ -904,9 +925,10 @@ public class SyntaxAnalyzer {
                 case 13:
                     if (grammar.first(new Token(null, "term", "NONTERMINAL")).contains(token)) {
                         lexicalAnalyzer.setRepeatToken();
-                        if (term())
+                        if (term()) {
+                            codeGen.do_opr();
                             state = 14;
-                        else
+                        } else
                             return false;
                     } else
                         System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
@@ -915,6 +937,7 @@ public class SyntaxAnalyzer {
                     switch (tokenName) {
                         case "+":
                         case "-":
+                            codeGen.pOpr(tokenName);
                             state = 17;
                             break;
                         default:
@@ -928,9 +951,10 @@ public class SyntaxAnalyzer {
                 case 16:
                     if (grammar.first(new Token(null, "term", "NONTERMINAL")).contains(token)) {
                         lexicalAnalyzer.setRepeatToken();
-                        if (term())
+                        if (term()) {
+                            codeGen.do_opr();
                             state = 12;
-                        else
+                        } else
                             return false;
                     } else
                         System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
@@ -938,9 +962,10 @@ public class SyntaxAnalyzer {
                 case 17:
                     if (grammar.first(new Token(null, "term", "NONTERMINAL")).contains(token)) {
                         lexicalAnalyzer.setRepeatToken();
-                        if (term())
+                        if (term()) {
+                            codeGen.do_opr();
                             state = 14;
-                        else
+                        } else
                             return false;
                     } else
                         System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
@@ -963,7 +988,6 @@ public class SyntaxAnalyzer {
             String tokenName = token.getTokenName();
             switch (state) {
                 case 0:
-                case 3:
                     if (grammar.first(new Token(null, "factor", "NONTERMINAL")).contains(token)) {
                         lexicalAnalyzer.setRepeatToken();
                         if (factor())
@@ -976,6 +1000,7 @@ public class SyntaxAnalyzer {
                 case 1:
                     switch (tokenName) {
                         case "*":
+                            codeGen.pOpr(tokenName);
                             state = 3;
                             break;
                         default:
@@ -985,6 +1010,17 @@ public class SyntaxAnalyzer {
                             } else
                                 System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     }
+                    break;
+                case 3:
+                    if (grammar.first(new Token(null, "factor", "NONTERMINAL")).contains(token)) {
+                        lexicalAnalyzer.setRepeatToken();
+                        if (factor()) {
+                            codeGen.do_opr();
+                            state = 1;
+                        } else
+                            return false;
+                    } else
+                        System.out.println("unexpected token " + token.getLexeme() + " in input! skipping.");
                     break;
                 default:
                     return false;
@@ -1009,9 +1045,11 @@ public class SyntaxAnalyzer {
                             state = 1;
                             break;
                         case "NUM":
+                            codeGen.pNum(token.getLexeme());
                             state = 3;
                             break;
                         case "ID":
+                            codeGen.pID(token.getLexeme());
                             state = 4;
                             break;
                         default:
@@ -1070,6 +1108,7 @@ public class SyntaxAnalyzer {
                 case 6:
                     switch (tokenName) {
                         case "]":
+                            codeGen.pIndex();
                             state = 3;
                             break;
                         default:

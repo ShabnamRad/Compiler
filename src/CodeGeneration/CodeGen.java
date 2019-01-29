@@ -1,6 +1,7 @@
 package CodeGeneration;
 
 import Scanner.Token;
+import SymbolTable.SymbolTable;
 
 public class CodeGen {
 
@@ -15,6 +16,12 @@ public class CodeGen {
 
     private static int[] ss_switch = new int[100];
     private static int top_switch = -1;
+
+    private static String[] ss_expr = new String[100];
+    private static int top_expr = -1;
+
+    private static String[] ss_opr = new String[100];
+    private static int top_opr = -1;
 
 
     private static int getTemp() {
@@ -75,6 +82,36 @@ public class CodeGen {
         }
     }
 
+    private static void push_expr(String s) {
+        top_expr ++;
+        ss_expr[top_expr] = s;
+        System.out.println("pushed " + s + " in ss_expr");
+    }
+
+    private static String pop_expr() {
+        top_expr --;
+        System.out.println("popped from ss_expr");
+        return ss_expr[top_expr + 1];
+    }
+
+    private static void pop_expr(int n) {
+        for (int i = 0; i < n; i++) {
+            pop_expr();
+        }
+    }
+
+    private static void push_opr(String s) {
+        top_opr ++;
+        ss_opr[top_opr] = s;
+        System.out.println("pushed " + s + " in ss_opr");
+    }
+
+    private static String pop_opr() {
+        top_opr --;
+        System.out.println("popped from ss_opr");
+        return ss_opr[top_opr + 1];
+    }
+
     /*
     Code generation procedures start below
      */
@@ -100,10 +137,10 @@ public class CodeGen {
         System.out.println("#whileEnd");
         ProgramBlock[index] = "(JP, " + ss_while[top_while - 1] + ", , )";
         index ++;
-        ProgramBlock[ss_while[top_while]] = "(JPF, " + "X, " + index + ", )";
+        String X = pop_expr();
+        ProgramBlock[ss_while[top_while]] = "(JPF, " + X + ", " + index + ", )";
         ProgramBlock[ss_while[top_while - 2]] = "(JP, " + index + ", , )";
         pop_while(3);
-
     }
 
     public void if_save() {
@@ -114,7 +151,8 @@ public class CodeGen {
 
     public void if_jpfSave() {
         System.out.println("#if_jpfSave");
-        ProgramBlock[ss_if[top_if]] = "(JPF, " + "X, " + (index + 1) + ", )";
+        String X = pop_expr();
+        ProgramBlock[ss_if[top_if]] = "(JPF, " + X + ", " + (index + 1) + ", )";
         pop_if();
         push_if(index);
         index ++;
@@ -137,10 +175,12 @@ public class CodeGen {
         index ++;
     }
 
-    public void switch_matchCaseJpf(Token t) {
+    public void switch_matchCaseJpf() {
         System.out.println("#switch_matchCaseJpf");
         int D = getTemp();
-        ProgramBlock[index] = "(EQ, X, #" + t.getLexeme() + ", " + D + ")";
+        String X = ss_expr[top_expr - 1];
+        String caseNum = pop_expr();
+        ProgramBlock[index] = "(EQ, X, " + caseNum + ", " + D + ")";
         ProgramBlock[ss_switch[top_switch]] = "(JPF, " + ss_switch[top_switch - 1] + ", " + index + ", )";
         pop_switch(2);
         index ++;
@@ -182,5 +222,68 @@ public class CodeGen {
             ProgramBlock[index] = "(JP, " + ss_switch[top_switch - 2] + " , , )";
             index ++;
         } else System.err.println("Parse Error (break outside of while or switch)"); // Semantic Check
+    }
+
+    public void do_opr() {
+        System.out.println("#do_opr");
+        String opr = pop_opr();
+        String a = pop_expr();
+        String b = pop_expr();
+        int D = getTemp();
+        String code = "";
+        switch(opr) {
+            case "+":
+                code = "(ADD, " + a + ", " + b + ", " + D + ")";
+                break;
+            case "-":
+                code = "(SUB, " + a + ", " + b + ", " + D + ")";
+                break;
+            case "*":
+                code = "(MULT, " + a + ", " + b + ", " + D + ")";
+                break;
+            case "<":
+                code = "(LT, " + a + ", " + b + ", " + D + ")";
+                break;
+            case "==":
+                code = "(EQ, " + a + ", " + b + ", " + D + ")";
+                break;
+        }
+        ProgramBlock[index] = code;
+        index ++;
+        push_expr(Integer.toString(D));
+    }
+
+    public void pOpr(String s) {
+        System.out.println("#pOpr");
+        push_opr(s);
+    }
+
+    public void pNum(String lexeme) {
+        System.out.println("pNum");
+        push_expr("#" + lexeme);
+    }
+
+    public void pID(String lexeme) {
+        Token t = SymbolTable.get(lexeme);
+        int addr = t.getAddr();
+        push_expr(Integer.toString(addr));
+    }
+
+    public void pIndex() {
+        String expr = pop_expr();
+        String addrID = pop_expr();
+        push_expr("@" + addrID);
+        if(expr.startsWith("#")) {
+            push_opr("+");
+            push_expr(Integer.toString(Integer.parseInt(expr.substring(1)) * 4));
+            do_opr();
+        } else {
+            push_opr("+");
+            push_expr(expr);
+            push_opr("*");
+            push_expr("#4");
+            do_opr();
+            do_opr();
+        }
     }
 }
