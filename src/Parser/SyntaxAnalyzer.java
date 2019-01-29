@@ -114,7 +114,7 @@ public class SyntaxAnalyzer {
                             // Updating ID type
                             if (type_void) token.setType("void");
                             else token.setType("int");
-
+//                            System.out.println("^^^^^^^^^^^ " + token.getLexeme() + " " + token.getTokenName() + " " + token.getType() + " " + token.getScope());
                             state = 2;
                             break;
                         default:
@@ -286,6 +286,9 @@ public class SyntaxAnalyzer {
                 case 1:
                     switch (tokenName) {
                         case "ID":
+                            //Semantics
+                            token.setType("int");
+
                             state = 2;
                             break;
                         default:
@@ -349,6 +352,9 @@ public class SyntaxAnalyzer {
                 case 6:
                     switch (tokenName) {
                         case "ID":
+                            //Semantics
+                            token.setType("void");
+
                             state = 2;
                             break;
                         default:
@@ -379,8 +385,11 @@ public class SyntaxAnalyzer {
                         case ";":
                             state = 2;
                             break;
-                        case "continue": // CODE GEN: jump address of start of while
-                        case "break": // CODE GEN: savejump to address of end of while/switch
+                        case "continue":
+                            codeGen.while_continue();
+                            state = 1;
+                            break;
+                        case "break":
                             codeGen.jpTop(switchOrWhile.peek());
                             state = 1;
                             break;
@@ -772,6 +781,8 @@ public class SyntaxAnalyzer {
                                 while (s >= 0) {
                                     try {
                                         t = SymbolTable.get(token.getLexeme(), s);
+                                        if (t.getType().equals("unknown"))
+                                            throw new Error("ID not defined");
                                         codeGen.pID(t);
                                         break;
                                     } catch (Error e){
@@ -1124,6 +1135,8 @@ public class SyntaxAnalyzer {
                                 while (s >= 0) {
                                     try {
                                         t = SymbolTable.get(token.getLexeme(), s);
+                                        if (t.getType().equals("unknown"))
+                                            throw new Error("ID not defined");
                                         codeGen.pID(t);
                                         break;
                                     } catch (Error e){

@@ -133,6 +133,12 @@ public class CodeGen {
         index ++;
     }
 
+    public void while_continue() {
+        System.out.println("#while_continue");
+        ProgramBlock[index] = "(JP, " + ss_while[top_while] + ", , )";
+        index ++;
+    }
+
     public void whileEnd() {
         System.out.println("#whileEnd");
         ProgramBlock[index] = "(JP, " + ss_while[top_while - 1] + ", , )";
@@ -259,7 +265,7 @@ public class CodeGen {
     }
 
     public void pNum(String lexeme) {
-        System.out.println("pNum");
+        System.out.println("#pNum");
         push_expr("#" + lexeme);
     }
 
